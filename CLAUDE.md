@@ -37,7 +37,22 @@ Antes de abrir un PR:
   - `security-reviewer` (Sonnet): si toca auth, sesión, cookies, variables de entorno o dependencias nuevas.
   - Sus hallazgos son insumo para el usuario, no reemplazan su review en GitHub.
 
-Después de abrir un PR, darle al usuario (en español) **una lista de puntos concretos para comentar en su review**, incluidas las debilidades honestas del PR, y marcar qué dejaría pasar y por qué.
+Después de abrir un PR, darle al usuario (en español) **una lista de puntos concretos para comentar en su review**, incluidas las debilidades honestas del PR, y marcar qué dejaría pasar y por qué. Cada punto va con `archivo:línea` y el comentario ya redactado **en inglés**, con la convención de abajo, listo para pegar.
+
+Convención de review (la escribe el usuario en GitHub):
+- Comentarios **en líneas concretas** ("Start a review") y un resumen corto al final con **Review changes → Comment**. GitHub no deja que el autor apruebe ni pida cambios en su propio PR.
+- Prefijos:
+
+| Prefijo | Uso |
+|---|---|
+| `blocking:` | Hay que arreglarlo antes del merge |
+| `question:` | Entender una decisión |
+| `suggestion:` | Mejora opcional |
+| `nit:` | Detalle menor, no bloquea |
+| `leaving this:` | Se deja pasar a propósito, con la razón (al menos uno por PR) |
+
+- Cada comentario es concreto y trae el escenario ("logged in as Dani, X returns Y"). Nada de problemas inventados: si el PR está bien, "LGTM, merging" alcanza.
+- Las correcciones van en commits nuevos. El usuario responde "Fixed in `<hash>`" en el hilo y lo resuelve. El agente, en el mensaje del commit, dice qué comentario atiende.
 
 Tiempo:
 - **Límite total: 6 h.** Recordarle al usuario que anote los minutos reales de cada PR en `docs/TIMELOG.md`.

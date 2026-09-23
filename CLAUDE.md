@@ -54,6 +54,22 @@ Convención de review (la escribe el usuario en GitHub):
 - Cada comentario es concreto y trae el escenario ("logged in as Dani, X returns Y"). Nada de problemas inventados: si el PR está bien, "LGTM, merging" alcanza.
 - Las correcciones van en commits nuevos. El usuario responde "Fixed in `<hash>`" en el hilo y lo resuelve. El agente, en el mensaje del commit, dice qué comentario atiende.
 
+## Tareas (`docs/tasks/`)
+
+Todo trabajo vive en una tarea. **Una tarea = una rama = un PR.** Las plantillas están en `docs/tasks/_meta/` (`TASK_TEMPLATE.md` para trabajo planificado, `BUG_TEMPLATE.md` para bugs).
+
+- **El estado es la carpeta**, y el agente mueve el archivo con `git mv`:
+  - `0-backlog → 1-doing` al crear la rama; se completan `rama` y `actualizada`.
+  - `1-doing → 2-testing` al abrir el PR; se completa `pr`.
+  - `2-testing → 3-done` cuando el usuario mergea, en el primer commit de la tarea siguiente.
+- **Antes de pasar a `1-doing`**, correr las dos verificaciones de la plantilla: que no quede ningún `COMPLETAR` y que no falte ninguna sección.
+- **Antes de empezar una tarea con decisiones abiertas**, proponerle al usuario correr `/grill-me` sobre la tarea.
+- **Mientras se trabaja**, las decisiones, los bugs y lo que sale de la review del usuario van a "Notas de implementación", con fecha y la entrada más nueva arriba.
+- **Bugs:**
+  - **Dentro del alcance** de la tarea en curso: se arregla en esa rama, en un commit `fix:` propio, y se anota en sus notas.
+  - **Fuera del alcance** o que necesita una decisión: tarea nueva en `0-backlog/` con `BUG_TEMPLATE.md`, y se sigue con lo que se estaba haciendo.
+- La numeración sigue a la última tarea que exista en **cualquier** carpeta.
+
 Tiempo:
 - **Límite total: 6 h.** Recordarle al usuario que anote los minutos reales de cada PR en `docs/TIMELOG.md`.
 - No pulir de más. Si falta tiempo, recortar según el orden de recorte del plan.
@@ -106,6 +122,7 @@ Skills (instaladas globalmente en `~/.claude/skills`, no en el repo):
 | Formularios | `react-hook-form-zod`, `rhf-form-config` |
 | Gráfico | `dataviz` + Context7 para Recharts |
 | UI | `frontend-design`, `accessibility` |
+| Decisiones abiertas antes de una tarea | `/grill-me` (la invoca el usuario; el agente puede usar `grilling`) |
 
 `vercel-react-best-practices` y `nextjs-react-typescript` pueden estar desactualizadas para Next 16: ante una diferencia, manda la doc local de Next.
 

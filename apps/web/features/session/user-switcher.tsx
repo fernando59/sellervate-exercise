@@ -45,7 +45,7 @@ export function UserSwitcher({ people, current, enabled }: UserSwitcherProps) {
   }
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative min-w-0">
       <button
         type="button"
         aria-haspopup="true"
@@ -53,20 +53,23 @@ export function UserSwitcher({ people, current, enabled }: UserSwitcherProps) {
         aria-controls={menuId}
         onClick={() => setOpen((o) => !o)}
         disabled={isPending}
-        className="flex items-center gap-3 rounded-md border border-line bg-surface px-3 py-1.5 text-left transition-colors hover:border-line-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60"
+        title={current ? `${current.name} · ${current.summary}` : undefined}
+        className="flex min-w-0 max-w-[60vw] items-center gap-2 rounded-md border border-line bg-surface px-2 py-1.5 text-left transition-colors hover:border-line-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60 sm:max-w-xs sm:gap-3 sm:px-3 sm:py-1"
       >
         {current ? (
           <>
             <Initials name={current.name} />
-            <span className="flex flex-col leading-tight">
-              <span className="text-sm font-medium">{current.name}</span>
-              <span className="text-2xs text-ink-muted">{current.summary}</span>
+            {/* One line on phones (the roles would wrap and overflow the 56px
+                header); name and roles from sm up, truncated, never wrapped. */}
+            <span className="flex min-w-0 flex-col leading-tight">
+              <span className="truncate text-sm font-medium">{current.name}</span>
+              <span className="hidden truncate text-2xs text-ink-muted sm:block">{current.summary}</span>
             </span>
           </>
         ) : (
-          <span className="text-sm font-medium">Choose a person</span>
+          <span className="truncate text-sm font-medium">Choose a person</span>
         )}
-        <span aria-hidden className="text-ink-muted">
+        <span aria-hidden className="shrink-0 text-ink-muted">
           ▾
         </span>
       </button>
@@ -74,7 +77,7 @@ export function UserSwitcher({ people, current, enabled }: UserSwitcherProps) {
       {open ? (
         <div
           id={menuId}
-          className="absolute right-0 z-20 mt-2 w-72 overflow-hidden rounded-lg border border-line bg-surface shadow-lg"
+          className="absolute right-0 z-20 mt-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-line bg-surface shadow-lg"
         >
           <p className="border-b border-line px-4 py-2 font-mono text-2xs uppercase tracking-widest text-ink-muted">
             View the tool as
@@ -92,9 +95,9 @@ export function UserSwitcher({ people, current, enabled }: UserSwitcherProps) {
                     className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-sunken focus-visible:bg-sunken focus-visible:outline-none disabled:cursor-default aria-[current=true]:bg-accent-soft"
                   >
                     <Initials name={person.name} />
-                    <span className="flex flex-col leading-tight">
-                      <span className="text-sm font-medium">{person.name}</span>
-                      <span className="text-2xs text-ink-muted">{person.summary}</span>
+                    <span className="flex min-w-0 flex-col leading-tight">
+                      <span className="truncate text-sm font-medium">{person.name}</span>
+                      <span className="truncate text-2xs text-ink-muted">{person.summary}</span>
                     </span>
                   </button>
                 </li>

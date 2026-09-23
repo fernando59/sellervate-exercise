@@ -13,7 +13,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 border-b border-line bg-surface/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/" className="flex items-baseline gap-2">
+          <Link href="/" className="flex shrink-0 items-baseline gap-2">
             <span className="font-display text-base font-bold tracking-tight">Sellervate</span>
             <span className="font-mono text-2xs uppercase tracking-widest text-ink-muted">QA</span>
           </Link>

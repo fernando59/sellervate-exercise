@@ -234,7 +234,9 @@ sellervate-exercise/
 - **Lecturas:** en Server Components, llamando a `server/data`. **El navegador nunca habla con Supabase.**
 - **Escrituras:** con server actions, siempre en este orden: `getCurrentUser()` → `zod.parse` → cargar la fila objetivo (RLS) → `requireLeadOf(brandId)` → escribir → `revalidatePath`.
 - **`brandId` se deriva de la fila en la base de datos, nunca del body.**
-- **Un único route handler JSON** (`/api/brands/[slug]/replies`) para cumplir "si pedimos a la API otra marca, dice que no". Devuelve **403**.
+- **Dos route handlers JSON**, nada más:
+  - `/api/brands/[slug]/replies`, para cumplir "si pedimos a la API otra marca, dice que no". Devuelve **403**.
+  - `POST /api/demo-session` (`{ "person": "dani" }`), el mismo login del selector, para que el `curl` del README consiga la cookie (TASK-003, Q15). Solo acepta JSON.
 - **`service_role` solo en el seed.** La app usa siempre el JWT del usuario, así que RLS aplica siempre.
 - Las páginas con datos por usuario son dinámicas. **Nada de caché compartida** (`unstable_cache` o `"use cache"`) sin el usuario en la clave.
 - Tipos generados con `supabase gen types`: la base de datos es la fuente de verdad.

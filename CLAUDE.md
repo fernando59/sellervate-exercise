@@ -169,6 +169,4 @@ Actualizar esta lista cada vez que se mergea un PR.
 - [ ] `docs/decisions`: DECISIONS.md, README final, TIMELOG
 
 Pendientes conocidos:
-- `#user-switcher-slot` es un marcador vacío que se reemplaza en el PR3.
-- Las tablas tienen RLS activado pero sin políticas: hasta el PR3, la API no devuelve nada.
 - Nunca usar comillas invertidas dentro de strings de `bash -c`/`node -e`: bash las ejecuta. Para editar texto con Markdown, usar la herramienta Edit.

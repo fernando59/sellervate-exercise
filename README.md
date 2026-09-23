@@ -26,7 +26,28 @@ Three brands that read very differently: **Voltra** (e-scooters, diagnose before
 | Leo Marín | leo@sellervate.test | Specialist: Voltra, Hebra |
 | Sara Campos | sara@sellervate.test | Specialist: Boxwell, Hebra |
 
-Password for everyone: `password123` (local demo data only). Role switching and the authorization check land in the next pull request.
+Password for everyone: `password123` (local demo data only). The app reads it from `DEMO_USER_PASSWORD` in `apps/web/.env.local`, on the server only.
+
+## Switching roles
+
+Login is simulated: pick a person on the home page, or from the menu in the top-right corner. The app signs in as that person on the server, so everything that follows runs with their real Supabase session. Authorization is not simulated: Postgres row level security and a server-side membership check decide what each person sees.
+
+### Check the isolation in 10 seconds
+
+With `pnpm dev` running, sign in as Dani (specialist on Voltra and Boxwell) and ask for Hebra's replies:
+
+```bash
+curl -s -c dani.txt -X POST http://localhost:3000/api/demo-session -H "Content-Type: application/json" -d '{"person":"dani"}'
+curl -i -b dani.txt http://localhost:3000/api/brands/hebra/replies
+```
+
+Expected: `HTTP/1.1 403 Forbidden` and `{"error":"You do not have access to this brand."}`. The same request for `voltra` returns 200 with only Dani's own replies. Without the cookie it returns 401. A brand that does not exist also returns 403, so the API does not reveal which brands exist.
+
+To see the same rules straight from Postgres, without Next in between:
+
+```bash
+docker exec -i supabase_db_sellervate-qa psql -U postgres -d postgres < supabase/tests/rls-matrix.sql
+```
 
 ## Repository layout
 

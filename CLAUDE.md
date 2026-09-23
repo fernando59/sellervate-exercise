@@ -29,7 +29,7 @@ Reglas de Git:
 
 Antes de abrir un PR:
 - Correr `pnpm typecheck`, `pnpm lint` y `pnpm build` desde la raíz.
-- Si cambió la UI, mirar la página en el navegador.
+- Si cambió la UI, mirar la página en el navegador **a 320, 375, 768 y 1280 px**: sin scroll horizontal (`scrollWidth === innerWidth`), nada que se salga de su contenedor y los menús dentro de la pantalla.
 - Si cambió el esquema, correr `pnpm db:reset` y comprobar que el seed carga.
 - Pasar los subagentes de `.claude/agents/` (en paralelo) y resumirle al usuario lo que encontraron:
   - `code-reviewer` (Sonnet): siempre.
@@ -88,6 +88,7 @@ Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuar
 - **Ninguna funcionalidad de IA ni scoring automático.** Las ideas sobre modelos van a DECISIONS.md en un párrafo.
 - El seed es creíble (nada de lorem ipsum), las marcas suenan distintas y va en `seed.sql`, nunca en las migraciones.
 - En la UI, colores y tipografía **solo con las clases de token** (`bg-surface`, `text-ink-muted`, `border-line`, `text-bad`…), nunca hex sueltos.
+- **Toda UI es responsive desde el primer commit**, mobile-first (clases base para el móvil, `sm:`/`md:`/`lg:` para agrandar). Los textos que pueden crecer (nombres, marcas, asuntos) van con `truncate` o `min-w-0` dentro de flex, en vez de partirse y romper la altura. Lo que no entra en el móvil se oculta con `hidden sm:block`; no se achica hasta volverse ilegible. Las tablas y la cola de dos columnas se apilan en el móvil.
 
 ## Librerías y documentación
 

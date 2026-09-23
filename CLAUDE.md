@@ -64,7 +64,7 @@ Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuar
 | `react-hook-form` + `@hookform/resolvers` | 4 | Formularios con `zodResolver` |
 | `recharts` + `react-is` | 6 | `react-is` es peer dependency y pnpm no la instala sola |
 
-Descartadas: shadcn, TanStack Query/Table, tRPC, date-fns (alcanza con `Intl.DateTimeFormat` / `Intl.RelativeTimeFormat`) y clsx.
+Descartadas: daisyUI (sus temas chocan con nuestros tokens y el diseño tiene que verse propio; va a Architecture en DECISIONS.md), shadcn, TanStack Query/Table, tRPC, date-fns (alcanza con `Intl.DateTimeFormat` / `Intl.RelativeTimeFormat`) y clsx.
 
 Formularios (RHF + zod):
 - **Un solo schema para cliente y servidor**, en `features/<dominio>/<form>.config.ts`: schema, tipos inferidos, defaults y labels. El `.tsx` queda con el JSX y los handlers (patrón de la skill `rhf-form-config`, con server action en lugar de route handler).

@@ -10,6 +10,8 @@ _TBD._
 
 _TBD._
 
+- **No component library (daisyUI was optional).** The UI uses its own tokens: sage neutrals, one ink-blue accent, semantic colours only for review outcomes. daisyUI's themes would have to be overridden token by token to keep that system, and the few components it would save (buttons, badges, inputs) are a few lines of Tailwind each.
+
 ## AI
 
 **Documentation before code.** Before the agent uses any library API, it reads the docs for the installed version, either through Context7 or the official docs. For Next.js 16 it reads the docs bundled in `node_modules/next/dist/docs/`, because the model's training data predates several API changes.

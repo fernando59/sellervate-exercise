@@ -875,3 +875,45 @@ Mi prueba armó mal la ruta por el escapado de las barras. La construyo con `pat
 
 > 🔧 `Bash` — Validate settings JSON, run exact hook command, check gitignore
 
+
+### 🤖 Asistente
+
+El hook funciona. Ahora commiteo el log actualizado, dejo anotada la regla en `CLAUDE.md` y guardo el estado para la próxima sesión.
+
+> 🔧 `Bash` — Locate session log rule in CLAUDE.md
+
+> 🔧 `Edit`
+
+> 🔧 `Bash` — Commit rule and refreshed log, push
+
+
+### 🤖 Asistente
+
+Ahora guardo en la memoria el estado actual, para que la próxima sesión sepa por dónde seguir.
+
+> 🔧 `Write`
+
+> 🔧 `Bash` — Add memory index entry
+
+
+### 🤖 Asistente
+
+Guardé la conversación y dejé automatizado el guardado para las próximas sesiones.
+
+**Esta conversación** quedó en `ai-logs/03-reglas-y-agentes.md` y `.jsonl`, en la rama `feat/schema-seed`, así que entra en el PR2. Redacté tu email y las claves locales de Supabase que imprimió `supabase start`. Son las claves demo públicas del CLI, pero no conviene que queden en un repo público.
+
+**El guardado automático** es un hook `SessionEnd` que se dispara cuando limpias el chat o cierras la sesión:
+- Exporta la sesión a `ai-logs/NN-<tema>.md` + `.jsonl` y redacta tu email, las claves `sb_secret_…` y cualquier JWT de `service_role`.
+- Si la sesión ya tenía log, lo actualiza con el mismo número; si no, crea el siguiente usando el nombre de la rama.
+- Lo probé contra esta sesión y funciona.
+- **No hace commit**, porque desde un hook podría quedar en la rama equivocada. Dejé la regla en `CLAUDE.md`: al empezar una sesión, si `ai-logs/` tiene cambios, los commiteo en la rama de la tarea en curso.
+- El script y su configuración (`.claude/hooks/` y `.claude/settings.local.json`) **quedan locales y no se suben**, porque contienen tu email.
+- Si no se activa en el primer `/clear`, abre `/hooks` una vez o reinicia Claude Code para que lea la configuración. Eso tiene que hacerse desde una terminal interactiva de `claude`, no desde esta app.
+
+**Para la próxima sesión** guardé en la memoria el estado actual:
+- **PR2** (esquema y seed): espera tu review escrita.
+- **PR3** (tablero de tareas): se mergea después del PR2.
+- **Lo siguiente:** TASK-003, la autorización. Antes de empezarla te voy a proponer `/grill-me`.
+
+Antes de limpiar, anota en `docs/TIMELOG.md` los minutos del PR2 y del tablero de tareas.
+

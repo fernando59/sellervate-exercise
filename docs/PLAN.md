@@ -444,7 +444,7 @@ export async function getBrandTrend(brandId: string, weeks = 8) {
 | # | Rama | Alcance | Presupuesto | Revisar con lupa |
 |---|---|---|---|---|
 | 1 | `chore/scaffold` | workspace, app Next, config de Supabase, tokens, shell, README | 30 min | que no haya claves; `.env.example` completo |
-| 2 | `feat/schema-seed` | migraciones (tablas, FKs, índices, checks) + `seed.sql` + `pnpm setup` | 60 min | FK compuesta, `unique(source, external_id)`, sin enums, seed fuera de migraciones; que `setup` no escriba la clave `service_role` en `.env.local` |
+| 2 | `feat/schema-seed` | migraciones (tablas, FKs, índices, checks) + `seed.sql` + `pnpm bootstrap` | 60 min | FK compuesta, `unique(source, external_id)`, sin enums, seed fuera de migraciones; que `bootstrap` no escriba la clave `service_role` en `.env.local` |
 | 3 | `feat/authz` | usuarios de seed en Auth, selector, RLS, `requireMember`/`requireLeadOf`, cliente por request, API con 403 | 50 min | **`service_role`**, tablas sin RLS, `using (true)`, `brand_id` desde el body |
 | 4 | `feat/review-queue` | cola del lead, detalle con reglas de la marca, formulario de reseña (server action + zod), atajos | 60 min | que la acción revalide la membresía; validación de la nota |
 | 5 | `feat/my-feedback` | vista del especialista | 30 min | agregados con datos de otros |
@@ -454,7 +454,7 @@ export async function getBrandTrend(brandId: string, weeks = 8) {
 
 Total: ~5 h 45 min + 15 min de colchón.
 
-**Levantar todo con un comando (`pnpm setup`)** — decidido: no hay `docker-compose` propio. El CLI de Supabase ya levanta el stack con Docker y aplica migraciones y seed; copiar el stack self-hosted costaría 1–2 h y arriesgaría Auth, del que depende la autorización. `scripts/setup.mjs` (Node, para que funcione igual en Windows) hace: `supabase start` → `supabase db reset` → lee `supabase status -o env` → crea `apps/web/.env.local` con la URL y la clave anon/publishable **solo si no existe**, y **nunca** escribe `service_role`. Va a Architecture en DECISIONS.md.
+**Levantar todo con un comando (`pnpm bootstrap`)** — decidido (no `pnpm setup`: es un comando propio de pnpm y le gana al script): no hay `docker-compose` propio. El CLI de Supabase ya levanta el stack con Docker y aplica migraciones y seed; copiar el stack self-hosted costaría 1–2 h y arriesgaría Auth, del que depende la autorización. `scripts/bootstrap.mjs` (Node, para que funcione igual en Windows) hace: `supabase start` → `supabase db reset` → lee `supabase status -o json` → crea `apps/web/.env.local` con la URL y la clave anon/publishable **solo si no existe**, y **nunca** escribe `service_role`. Va a Architecture en DECISIONS.md.
 
 **Orden de recorte si falta tiempo:** `brand_events` → atajos de teclado → tabla por especialista en la página de marca.
 

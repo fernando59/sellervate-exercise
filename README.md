@@ -8,13 +8,25 @@ Requirements: Node ≥ 20.9, pnpm 11 (`corepack enable`), Docker running.
 
 ```bash
 pnpm install
-pnpm db:start                     # local Supabase in Docker (first run pulls images)
-cp apps/web/.env.example apps/web/.env.local
-pnpm db:status                    # copy API URL and anon key into apps/web/.env.local
-pnpm dev                          # http://localhost:3000
+pnpm bootstrap     # starts local Supabase in Docker, applies migrations + seed, writes apps/web/.env.local
+pnpm dev           # http://localhost:3000
 ```
 
-Seed data, role switching and the authorisation check land in the next pull requests.
+The first `pnpm bootstrap` pulls the Supabase images and takes a few minutes; later runs take seconds. `pnpm db:reset` re-applies migrations and the seed at any time. `apps/web/.env.local` is only written if it does not exist, and only ever gets the anon key.
+
+### Seed data
+
+Three brands that read very differently: **Voltra** (e-scooters, diagnose before offering a return), **Boxwell** (B2B packaging, three exact lines) and **Hebra** (a yarn shop). 45 replies over the last six weeks, 32 of them reviewed. Most of yesterday's replies are unreviewed, so the queue has work.
+
+| Person | Email | Role |
+|---|---|---|
+| Marta Ruiz | marta@sellervate.test | Lead: Voltra, Boxwell |
+| Nuria Vidal | nuria@sellervate.test | Lead: Hebra |
+| Dani Ortega | dani@sellervate.test | Specialist: Voltra, Boxwell |
+| Leo Marín | leo@sellervate.test | Specialist: Voltra, Hebra |
+| Sara Campos | sara@sellervate.test | Specialist: Boxwell, Hebra |
+
+Password for everyone: `password123` (local demo data only). Role switching and the authorization check land in the next pull request.
 
 ## Repository layout
 

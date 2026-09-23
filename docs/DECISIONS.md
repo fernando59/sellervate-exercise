@@ -11,7 +11,7 @@ _TBD._
 _TBD._
 
 - **No component library (daisyUI was optional).** The UI uses its own tokens: sage neutrals, one ink-blue accent, semantic colours only for review outcomes. daisyUI's themes would have to be overridden token by token to keep that system, and the few components it would save (buttons, badges, inputs) are a few lines of Tailwind each.
-- **No Docker files of our own.** The Supabase CLI already runs the local stack in Docker and applies migrations and the seed, so `pnpm setup` wraps it into one command. Containerizing the Next app would add a build step without removing the Node requirement (the CLI needs it), and a hand-written self-hosted Supabase compose would lose `db reset` and type generation.
+- **No Docker files of our own.** The Supabase CLI already runs the local stack in Docker and applies migrations and the seed, so `pnpm bootstrap` wraps it into one command. Containerizing the Next app would add a build step without removing the Node requirement (the CLI needs it), and a hand-written self-hosted Supabase compose would lose `db reset` and type generation.
 
 ## AI
 

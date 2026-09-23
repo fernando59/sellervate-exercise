@@ -95,7 +95,7 @@ Gráfico (Recharts):
 - Client component (`'use client'`) que recibe los datos ya serializados desde un Server Component.
 - Colores desde variables CSS (`var(--accent)`, `var(--line)`…), nunca hex.
 
-Tipos de la base: generarlos con `supabase gen types --local` en `apps/web/server/supabase/database.types.ts` (script `db:types`, se agrega en el PR2).
+Tipos de la base: generarlos con `supabase gen types --local` en `apps/web/server/supabase/database.types.ts` con `pnpm db:types`. Se regeneran y se commitean en cada PR que cambia el esquema.
 
 Skills (instaladas globalmente en `~/.claude/skills`, no en el repo):
 
@@ -122,9 +122,11 @@ pnpm dev          # Next en http://localhost:3000
 pnpm typecheck    # next typegen && tsc --noEmit (LayoutProps/PageProps son tipos generados)
 pnpm lint
 pnpm build
-pnpm db:start     # Supabase local (Docker tiene que estar corriendo)
+pnpm bootstrap    # Supabase local + migraciones + seed + .env.local (Docker tiene que estar corriendo)
+pnpm db:start     # solo levanta Supabase local
 pnpm db:reset     # re-aplica migraciones + seed
 pnpm db:status    # muestra la URL local y las claves
+pnpm db:types     # regenera apps/web/server/supabase/database.types.ts desde la base local
 ```
 
 - **Next.js 16 cambió APIs respecto de versiones anteriores.** Antes de usar una API poco común, leer `apps/web/node_modules/next/dist/docs/` (ver `apps/web/AGENTS.md`).
@@ -138,7 +140,7 @@ Actualizar esta lista cada vez que se mergea un PR.
 
 - Repo: https://github.com/fernando59/sellervate-exercise (público; solo merge commits)
 - [x] PR1 `chore/scaffold`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/1), sin review escrita
-- [ ] PR2 `feat/schema-seed`: en curso (incluye `pnpm setup`, ver sección 11 del plan)
+- [ ] PR2 `feat/schema-seed`: en curso (incluye `pnpm bootstrap`, ver sección 11 del plan)
 - [ ] PR3 `feat/authz`
 - [ ] PR4 `feat/review-queue`
 - [ ] PR5 `feat/my-feedback`
@@ -146,7 +148,7 @@ Actualizar esta lista cada vez que se mergea un PR.
 - [ ] PR7 `feat/states-polish`
 - [ ] `docs/decisions`: DECISIONS.md, README final, TIMELOG
 
-Pendientes conocidos que vienen del PR1:
-- El texto de la home menciona `pnpm db:reset` antes de que exista el seed.
+Pendientes conocidos:
 - `#user-switcher-slot` es un marcador vacío que se reemplaza en el PR3.
-- `pnpm db:start` todavía no se probó en limpio; se prueba en el PR2.
+- Las tablas tienen RLS activado pero sin políticas: hasta el PR3, la API no devuelve nada.
+- Nunca usar comillas invertidas dentro de strings de `bash -c`/`node -e`: bash las ejecuta. Para editar texto con Markdown, usar la herramienta Edit.

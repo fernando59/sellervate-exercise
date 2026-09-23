@@ -161,7 +161,7 @@ Actualizar esta lista cada vez que se mergea un PR.
 - [x] PR1 `chore/scaffold`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/1), sin review escrita
 - [x] PR2 `feat/schema-seed`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/2), sin review escrita
 - [x] `chore/task-board` (tablero `docs/tasks/`): mergeado (https://github.com/fernando59/sellervate-exercise/pull/3)
-- [ ] PR3 `feat/authz`: en curso (en GitHub será el #4, porque el #3 es el tablero)
+- [ ] PR3 `feat/authz`: abierto (https://github.com/fernando59/sellervate-exercise/pull/4), pendiente de review
 - [ ] PR4 `feat/review-queue`
 - [ ] PR5 `feat/my-feedback`
 - [ ] PR6 `feat/brand-overview`

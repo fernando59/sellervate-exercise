@@ -22,3 +22,7 @@ supabase/.temp
 *.log
 .vercel
 coverage/
+
+# local agent config
+.claude/*
+!.claude/agents/

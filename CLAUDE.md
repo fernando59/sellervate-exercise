@@ -1,56 +1,94 @@
-# Sellervate QA: agent instructions
+# Sellervate QA: instrucciones para el agente
 
-Take-home exercise for Sellervate (Product Engineer). An internal tool where team leads review support replies that already went out and specialists read the feedback on their own work. Full plan, decisions and PR sequence: @docs/PLAN.md
+Ejercicio técnico para Sellervate (Product Engineer, full stack). Es una herramienta interna donde los team leads evalúan respuestas de soporte **ya enviadas** y los especialistas leen el feedback sobre su propio trabajo.
 
-## Working agreement
+**Todo el contexto y las decisiones ya tomadas están en el plan, que se carga a continuación.** No hay que volver a preguntarle al usuario lo que ya está ahí.
 
-- **Talk to the user in Spanish.** Code, commits, PRs, README and DECISIONS.md are in English.
-- **One branch and one small PR per piece of work** (readable in ~5 minutes), following the PR plan in `docs/PLAN.md`. Branch from an up-to-date `main`.
-- Claude writes the code, commits and opens the PR with `gh pr create`. **The user writes the review on GitHub. Never post review comments, approve or merge on the user's behalf.** After the review, address comments with new commits on the same branch.
-- **No squash, no rebase, no force-push, no amending pushed commits.** The repo only allows merge commits. The history is graded.
-- Commits: conventional prefix (`feat`, `fix`, `chore`, `docs`), a body that explains why, and a `Co-Authored-By` trailer.
-- PR description sections: What, Checks (what was actually run, and what was **not** verified), Out of scope.
-- Before opening a PR, run `pnpm typecheck`, `pnpm lint` and `pnpm build` from the repo root, and look at the page in the browser if UI changed.
-- After opening a PR, list for the user (in Spanish) the points worth commenting on in their review, including honest weaknesses of the PR.
-- **Time cap: 6 h total.** Remind the user to log real minutes per PR in `docs/TIMELOG.md`. Do not gold-plate; cut scope using the cut order in the plan.
-- Session transcripts go to `ai-logs/NN-<topic>.md` + `.jsonl`, with the user's email replaced by `<redacted>`.
+@docs/PLAN.md
 
-## Non-negotiables
+---
 
-- Authorisation is enforced on the server: Postgres RLS plus explicit checks in `server/auth`. Hiding UI is not authorisation.
-- Never use the `service_role` key in app code paths; only for seeding.
-- Take `brand_id` from the database row, never from request input.
-- Every new table gets RLS in the same migration.
-- No AI or automatic scoring features. Ideas about models go in DECISIONS.md as a paragraph.
-- Seed data is realistic (no lorem ipsum); brands must sound different.
+## Idioma
 
-## Stack and commands
+- **Con el usuario: siempre en español.**
+- **Documentos de planificación para el usuario y el agente** (`CLAUDE.md`, `docs/PLAN.md`): en español.
+- **Lo que lee el equipo evaluador de Sellervate** (código, textos de la app, commits, PRs, `README.md`, `docs/DECISIONS.md`, `docs/TIMELOG.md`): en **inglés**.
 
-pnpm 11 workspace. `apps/web` is Next.js 16 App Router + TypeScript + Tailwind v4. `supabase/` holds the local Supabase config, migrations and seed. The Supabase CLI is a root devDependency, so use `pnpm exec supabase …`.
+## Forma de trabajar (obligatoria)
+
+1. **Una rama y un PR pequeño por tarea** (legible en ~5 minutos), siguiendo el plan de PRs (sección 11 del plan). La rama sale de un `main` actualizado (`git checkout main && git pull`).
+2. **El agente escribe el código, hace los commits y abre el PR** con `gh pr create`.
+3. **La review la escribe el usuario en GitHub.** El agente **nunca** comenta, aprueba ni hace merge en nombre del usuario.
+4. Después de la review, las correcciones van en **commits nuevos en la misma rama**.
+5. El usuario hace el merge con **"Create a merge commit"**.
+
+Reglas de Git:
+- **Prohibido:** squash, rebase, force-push y amend de commits ya subidos. El repo solo permite merge commits, y el historial se evalúa.
+- **Commits:** prefijo convencional (`feat`, `fix`, `chore`, `docs`, `refactor`), un cuerpo que explique **por qué** y el trailer `Co-Authored-By`.
+- **Descripción del PR**, con estas secciones: **What**, **Checks** (lo que se corrió de verdad y lo que **no** se verificó) y **Out of scope**.
+
+Antes de abrir un PR:
+- Correr `pnpm typecheck`, `pnpm lint` y `pnpm build` desde la raíz.
+- Si cambió la UI, mirar la página en el navegador.
+- Si cambió el esquema, correr `pnpm db:reset` y comprobar que el seed carga.
+
+Después de abrir un PR, darle al usuario (en español) **una lista de puntos concretos para comentar en su review**, incluidas las debilidades honestas del PR, y marcar qué dejaría pasar y por qué.
+
+Tiempo:
+- **Límite total: 6 h.** Recordarle al usuario que anote los minutos reales de cada PR en `docs/TIMELOG.md`.
+- No pulir de más. Si falta tiempo, recortar según el orden de recorte del plan.
+
+Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuario reemplazado por `<redacted>`. Ojo: también aparece escapado dentro de comandos `sed`.
+
+## No negociables
+
+- **La autorización se aplica en el servidor**: RLS en Postgres **más** chequeos explícitos en `server/auth`. Ocultar UI no es autorización.
+- **Nunca** usar la clave `service_role` en código de la app; solo en el seed.
+- `brand_id` sale de la fila en la base de datos, **nunca** del input del request.
+- Toda tabla nueva lleva RLS **en la misma migración**. Las vistas llevan `security_invoker = on`.
+- Nada de enums de Postgres para catálogos; usar tablas o `text` + `check`.
+- **Ninguna funcionalidad de IA ni scoring automático.** Las ideas sobre modelos van a DECISIONS.md en un párrafo.
+- El seed es creíble (nada de lorem ipsum), las marcas suenan distintas y va en `seed.sql`, nunca en las migraciones.
+- En la UI, colores y tipografía **solo con las clases de token** (`bg-surface`, `text-ink-muted`, `border-line`, `text-bad`…), nunca hex sueltos.
+
+## Stack y comandos
+
+Workspace pnpm 11:
+- `apps/web`: Next.js **16** App Router + TypeScript + Tailwind **v4**.
+- `supabase/`: config local, migraciones y seed.
+- El CLI de Supabase es devDependency de la raíz: se usa como `pnpm exec supabase …`, no hay instalación global.
 
 ```bash
-pnpm dev          # Next dev server on :3000
-pnpm typecheck    # next typegen && tsc --noEmit (LayoutProps/PageProps are generated types)
+pnpm install
+pnpm dev          # Next en http://localhost:3000
+pnpm typecheck    # next typegen && tsc --noEmit (LayoutProps/PageProps son tipos generados)
 pnpm lint
 pnpm build
-pnpm db:start     # local Supabase (Docker must be running)
-pnpm db:reset     # re-apply migrations + seed
-pnpm db:status    # prints local URL and keys
+pnpm db:start     # Supabase local (Docker tiene que estar corriendo)
+pnpm db:reset     # re-aplica migraciones + seed
+pnpm db:status    # muestra la URL local y las claves
 ```
 
-- Next.js 16 differs from older versions: read `apps/web/node_modules/next/dist/docs/` before using an unfamiliar API (see `apps/web/AGENTS.md`).
-- Design tokens (colours, type scale, fonts) live in `apps/web/app/globals.css`. Use the token classes (`bg-surface`, `text-ink-muted`, `border-line`, `text-bad`…), never raw hex values.
-- Env: `apps/web/.env.local` (copied from `.env.example`). Never commit secrets.
+- **Next.js 16 cambió APIs respecto de versiones anteriores.** Antes de usar una API poco común, leer `apps/web/node_modules/next/dist/docs/` (ver `apps/web/AGENTS.md`).
+- Variables de entorno: `apps/web/.env.local`, copiado de `apps/web/.env.example`. Nunca commitear secretos.
+- Servicios de Supabase desactivados en `supabase/config.toml` para arrancar más rápido: realtime, storage, edge runtime, analytics y smtp.
+- Entorno del usuario: Windows 11, Git Bash / PowerShell, Node 26, Docker Desktop, `gh` autenticado como `fernando59`.
 
-## Current status
+## Estado actual
 
-Update this list when a PR merges.
+Actualizar esta lista cada vez que se mergea un PR.
 
-- [ ] PR1 `chore/scaffold` (open: https://github.com/fernando59/sellervate-exercise/pull/1)
+- Repo: https://github.com/fernando59/sellervate-exercise (público; solo merge commits)
+- [ ] PR1 `chore/scaffold`: abierto, pendiente de review del usuario (https://github.com/fernando59/sellervate-exercise/pull/1)
 - [ ] PR2 `feat/schema-seed`
 - [ ] PR3 `feat/authz`
 - [ ] PR4 `feat/review-queue`
 - [ ] PR5 `feat/my-feedback`
 - [ ] PR6 `feat/brand-overview`
 - [ ] PR7 `feat/states-polish`
-- [ ] DECISIONS.md, final README, time log
+- [ ] `docs/decisions`: DECISIONS.md, README final, TIMELOG
+
+Pendientes conocidos que vienen del PR1:
+- El texto de la home menciona `pnpm db:reset` antes de que exista el seed.
+- `#user-switcher-slot` es un marcador vacío que se reemplaza en el PR3.
+- `pnpm db:start` todavía no se probó en limpio; se prueba en el PR2.

@@ -210,3 +210,75 @@ Ahora exporto el resto de esta sesión a `ai-logs/02-scaffold` (lo que falta des
 
 
 > 🔧 `Bash` — Export remaining session transcript as 02-scaffold, redacted
+
+
+### 🤖 Asistente
+
+Quedan dos apariciones en forma escapada (dentro de mis propios comandos `sed`). Las borro también:
+
+
+> 🔧 `Bash` — Redact escaped email occurrences and validate
+
+
+> 🔧 `Bash` — Commit CLAUDE.md, plan and log; update PR description
+
+
+> 🔧 `Bash` — Verify PR description was updated
+
+
+### 🤖 Asistente
+
+Añadí dos archivos y los subí al PR1 como un tercer commit; también actualicé la descripción del PR.
+
+**[CLAUDE.md](CLAUDE.md)** (raíz del repo): Claude Code lo **carga automáticamente al empezar cada sesión**, así que no tienes que pedirle que lea nada. Contiene:
+- **Reglas de trabajo:**
+  - Conmigo en español; el código y la documentación del repo, en inglés.
+  - Una rama y un PR pequeño por tarea.
+  - **La review la escribes tú**: yo nunca comento, apruebo ni hago merge por ti.
+  - Nada de squash, rebase ni force-push.
+  - El límite de 6 h.
+  - Los logs de sesión se guardan con el email borrado.
+- **Reglas de seguridad no negociables:** RLS más chequeo en servidor, nada de `service_role` en la app, `brand_id` siempre desde la base de datos.
+- **Comandos, datos del stack y trampas conocidas:** Next 16 es distinto a versiones anteriores y el typecheck necesita `typegen`.
+- **Estado actual**, con una casilla por PR que hay que ir marcando.
+
+**[docs/PLAN.md](docs/PLAN.md)**: todo lo que decidimos en esta sesión. CLAUDE.md lo importa con `@docs/PLAN.md`, así que también se carga solo. Incluye:
+- El brief resumido y los pesos de la evaluación.
+- La lectura elegida, lo recortado y los supuestos.
+- Las gravedades de las etiquetas y la matriz de quién ve qué.
+- La arquitectura, la autorización y el modelo de datos.
+- El seed y el plan de PRs con el orden de recorte si falta tiempo.
+- El checklist de review.
+- La idea de dónde encajaría la IA.
+
+También guardé esta sesión en `ai-logs/02-scaffold.md` y `.jsonl`, con el email borrado (incluso donde salía escapado dentro de mis propios comandos), para que no se pierda al borrarla.
+
+**Para la sesión nueva:**
+1. Abre la sesión en `D:\Work\Freelance\sellervate-project`.
+2. Si todavía no mergeaste el PR1, haz la review y el merge. Después, `git checkout main && git pull`.
+3. Dile algo como *"vamos con el PR2"*: ya sabrá qué es, en qué rama va y qué reglas seguir.
+
+El `CLAUDE.md` se lee desde la rama en la que estés. Como ahora solo existe en `chore/scaffold`, conviene hacer el merge antes de empezar la sesión nueva.
+
+
+---
+
+## 🧑 Usuario
+
+bien ,crea todo eso, o detallao todo bien, como esta el html y tdo eso, asi no tengo que rerpotir, ademas ponlo en epsaol
+
+
+### 🤖 Asistente
+
+Lo reescribo todo en español y con el nivel de detalle del HTML (pantallas, gráfico, SQL de referencia, alternativas de arquitectura…).
+
+Un matiz: `CLAUDE.md` y `docs/PLAN.md` van en español, porque son para ti y para el agente. En cambio, el código, los commits, los PRs, el README y el DECISIONS.md siguen en inglés, porque los lee el equipo evaluador. Lo dejo escrito así en las reglas.
+
+
+> 🔧 `Write` — D:\Work\Freelance\sellervate-project\docs\PLAN.md
+
+
+> 🔧 `Write` — D:\Work\Freelance\sellervate-project\CLAUDE.md
+
+
+> 🔧 `Bash` — Refresh session log, commit Spanish plan and push

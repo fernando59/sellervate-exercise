@@ -72,11 +72,19 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 
 ## Qué hacer
 
-- Migración nueva: `is_lead_of(brand_id)`, `is_member_of(brand_id)`, políticas de `select` para todas las tablas y de `insert`/`update` para `reviews` y `review_issues`, `revoke truncate`.
-- `server/supabase/server.ts`, `server/auth/session.ts` (`getCurrentUser`, `requireMember`, `requireLeadOf`), errores 401/403/404 tipados.
-- Server action del selector: `signInWithPassword` con la contraseña del seed **del lado del servidor**.
-- `app/api/brands/[slug]/replies/route.ts`.
+- Migración nueva:
+  - `is_lead_of(brand_id)`, `is_member_of(brand_id)` y un helper para "comparte marca con".
+  - Políticas de `select` según la matriz de las notas (2026-09-23 · grill, Q4).
+  - `reviews`: `insert` y `update` del propio lead, con `grant update (score, comment, is_exemplar)` y sin `delete`. `review_issues`: `insert` y `delete` si la reseña padre es propia y el usuario lidera la marca.
+  - `revoke all` a `anon`; `revoke truncate, references, trigger` a `authenticated`; `alter default privileges` para las tablas futuras.
+- `server/supabase/server.ts`, `server/auth/session.ts` (`getCurrentUser` con `getUser()`, `requireMember`, `requireLeadOf`), errores 401/403 tipados.
+- `proxy.ts` para renovar la sesión (confirmar el nombre en la doc local de Next 16).
+- `server/auth/demo-users.ts`: las 5 personas del seed (email, nombre, etiqueta de rol). La contraseña sale de `DEMO_USER_PASSWORD` (solo servidor); si falta, el selector se desactiva. `bootstrap` agrega la variable a `.env.local` si no está.
+- Server action del selector: `signInWithPassword` **del lado del servidor**.
+- `/` sin sesión: las 5 personas con su rol; la cabecera dice "Choose a person". Sin login automático.
+- `app/api/brands/[slug]/replies/route.ts`: 401 sin sesión; 403 si la marca no existe o no eres miembro (indistinguibles).
 - Reemplazar `#user-switcher-slot`.
+- `supabase/tests/rls-matrix.sql`: cuántas filas de cada tabla ve cada persona, para correr a mano con psql.
 
 ## Qué NO hacer
 
@@ -87,4 +95,22 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 
 ## Notas de implementación
 
-(vacío — no empezada)
+### 2026-09-23 · Grill, ronda 1 (decidido)
+- **Q1 contraseña del seed:** variable de entorno solo del servidor `DEMO_USER_PASSWORD`, no una constante. En producción no existiría; va a DECISIONS.md.
+- **Q2 lista del selector:** fija en `server/auth/demo-users.ts`. `anon` no lee nada de la base; los permisos reales salen de `brand_memberships`.
+- **Q3 sin sesión:** sin login automático; `/` muestra las 5 personas y sirve de guía para el evaluador.
+- **Q4 lecturas:**
+  - `brands`: las marcas de las que eres miembro.
+  - `brand_memberships`: las propias, más todas las de las marcas que lideras.
+  - `profiles`: tú, más quien comparta alguna marca contigo (solo nombres).
+  - `issue_types`: cualquier usuario autenticado.
+  - `brand_events`: los miembros de la marca.
+  - Ninguna tiene políticas de escritura.
+- **Q5 reseñas:** `insert` y `update` de la propia, con grant de columna (`score`, `comment`, `is_exemplar`); nadie borra.
+- **Q6:** `proxy.ts` para renovar el token.
+- **Q7:** `getUser()`, no `getClaims()`.
+- **Q8:** `revoke all` a `anon` y `revoke truncate, references, trigger` a `authenticated`, con default privileges.
+- **Q9:** una marca que no existe responde 403, igual que una ajena.
+- **Q10:** script `supabase/tests/rls-matrix.sql`, además de pegar la salida en el PR.
+
+Pendiente para la ronda 2: a dónde redirigir después de elegir persona, cerrar sesión, qué campos devuelve la API y si la reseña se guarda con una función `save_review` transaccional (condiciona Q5).

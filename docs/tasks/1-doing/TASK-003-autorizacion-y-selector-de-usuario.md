@@ -1,12 +1,12 @@
 ---
 id: TASK-003
 titulo: Autorización en el servidor y selector de usuario
-estado: backlog
+estado: doing
 prioridad: alta
 estimacion: 50
 creada: 2026-09-23
 actualizada: 2026-09-23
-rama:
+rama: feat/authz
 pr:
 tags: [authz, security, db]
 depende_de: [TASK-002]

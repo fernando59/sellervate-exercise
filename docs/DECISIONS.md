@@ -26,6 +26,8 @@ _TBD._
 | `dataviz` | built-in | Weekly trend chart |
 | `frontend-design`, `accessibility` | anthropics/skills / community | Visual direction, keyboard and screen-reader checks |
 
+**Review subagents** (`.claude/agents/`, committed): before each PR is opened, read-only subagents check the diff. `code-reviewer` (Sonnet) looks for bugs and convention drift. `security-reviewer` (Sonnet) runs an OWASP-style pass on auth and input. `tenant-isolation-reviewer` (Opus) checks RLS, views and server checks against the role matrix, querying the local database as each seed user where it can. Tenant isolation gets the stronger model because a leak there costs a brand account. Their findings feed the human review on GitHub and do not replace it.
+
 _Where the agent was right, where it was corrected, and a verbatim prompt: TBD._
 
 ## Status

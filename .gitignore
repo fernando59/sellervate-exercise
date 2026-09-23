@@ -24,4 +24,5 @@ supabase/.temp
 coverage/
 
 # local agent config
-.claude/
+.claude/*
+!.claude/agents/

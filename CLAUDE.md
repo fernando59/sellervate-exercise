@@ -31,6 +31,11 @@ Antes de abrir un PR:
 - Correr `pnpm typecheck`, `pnpm lint` y `pnpm build` desde la raíz.
 - Si cambió la UI, mirar la página en el navegador.
 - Si cambió el esquema, correr `pnpm db:reset` y comprobar que el seed carga.
+- Pasar los subagentes de `.claude/agents/` (en paralelo) y resumirle al usuario lo que encontraron:
+  - `code-reviewer` (Sonnet): siempre.
+  - `tenant-isolation-reviewer` (Opus): si el PR toca migraciones, RLS, vistas, `server/`, server actions, route handlers o caché.
+  - `security-reviewer` (Sonnet): si toca auth, sesión, cookies, variables de entorno o dependencias nuevas.
+  - Sus hallazgos son insumo para el usuario, no reemplazan su review en GitHub.
 
 Después de abrir un PR, darle al usuario (en español) **una lista de puntos concretos para comentar en su review**, incluidas las debilidades honestas del PR, y marcar qué dejaría pasar y por qué.
 

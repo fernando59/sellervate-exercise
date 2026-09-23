@@ -51,6 +51,44 @@ Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuar
 - El seed es creíble (nada de lorem ipsum), las marcas suenan distintas y va en `seed.sql`, nunca en las migraciones.
 - En la UI, colores y tipografía **solo con las clases de token** (`bg-surface`, `text-ink-muted`, `border-line`, `text-bad`…), nunca hex sueltos.
 
+## Librerías y documentación
+
+- **Primero la documentación, después el código.** Antes de usar la API de una librería, consultar Context7 (`resolve-library-id` → `query-docs`, indicando la versión instalada) o la documentación oficial. En Next 16 manda la doc local (`apps/web/node_modules/next/dist/docs/`).
+- **Cada dependencia se instala en el PR que la usa por primera vez**, y el PR explica por qué la necesita.
+
+| Librería | PR | Notas |
+|---|---|---|
+| `@supabase/supabase-js` + `@supabase/ssr` | 3 | Un cliente por request, con las cookies de sesión |
+| `server-only` | 3 | En todo `server/`: el build falla si algo del servidor se importa desde el cliente |
+| `zod` (v4) | 4 | Importar desde `"zod"` y usar la API v4 |
+| `react-hook-form` + `@hookform/resolvers` | 4 | Formularios con `zodResolver` |
+| `recharts` + `react-is` | 6 | `react-is` es peer dependency y pnpm no la instala sola |
+
+Descartadas: shadcn, TanStack Query/Table, tRPC, date-fns (alcanza con `Intl.DateTimeFormat` / `Intl.RelativeTimeFormat`) y clsx.
+
+Formularios (RHF + zod):
+- **Un solo schema para cliente y servidor**, en `features/<dominio>/<form>.config.ts`: schema, tipos inferidos, defaults y labels. El `.tsx` queda con el JSX y los handlers (patrón de la skill `rhf-form-config`, con server action en lugar de route handler).
+- La server action **vuelve a correr `schema.parse`**: la validación del cliente es para la UX, no para la seguridad.
+- `handleSubmit` llama a la action dentro de `startTransition` (sin `useActionState`). La nota y las etiquetas van con `Controller`, y los atajos `1`–`5` usan `setValue`.
+
+Gráfico (Recharts):
+- Client component (`'use client'`) que recibe los datos ya serializados desde un Server Component.
+- Colores desde variables CSS (`var(--accent)`, `var(--line)`…), nunca hex.
+
+Tipos de la base: generarlos con `supabase gen types --local` en `apps/web/server/supabase/database.types.ts` (script `db:types`, se agrega en el PR2).
+
+Skills (instaladas globalmente en `~/.claude/skills`, no en el repo):
+
+| Tarea | Skill |
+|---|---|
+| Migraciones, RLS, índices | `supabase-postgres-best-practices` |
+| Revisar autorización (PR3) | `owasp-security`, `security-audit` |
+| Formularios | `react-hook-form-zod`, `rhf-form-config` |
+| Gráfico | `dataviz` + Context7 para Recharts |
+| UI | `frontend-design`, `accessibility` |
+
+`vercel-react-best-practices` y `nextjs-react-typescript` pueden estar desactualizadas para Next 16: ante una diferencia, manda la doc local de Next.
+
 ## Stack y comandos
 
 Workspace pnpm 11:

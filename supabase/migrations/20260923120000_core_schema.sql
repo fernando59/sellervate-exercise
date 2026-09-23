@@ -133,8 +133,11 @@ create table public.reviews (
   is_exemplar boolean not null default false,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),
+  -- restrict, not cascade: reviews are the record the product exists for. A
+  -- reply that has reviews cannot be deleted, so an importer that re-syncs by
+  -- delete + insert fails loudly instead of silently wiping the reviews.
   constraint reviews_reply_brand_fkey foreign key (reply_id, brand_id)
-    references public.replies (id, brand_id) on delete cascade,
+    references public.replies (id, brand_id) on delete restrict,
   -- One review per reply and reviewer; saving again edits it.
   constraint reviews_reply_id_reviewer_id_key unique (reply_id, reviewer_id)
 );

@@ -141,4 +141,60 @@ exception when insufficient_privilege then
 end $$;
 reset role;
 
+-- Marta backdates a review: created_at is not in the insert grant.
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+begin
+  insert into public.reviews (reply_id, brand_id, reviewer_id, score, created_at)
+  values (current_setting('sellervate.voltra_reply')::uuid, current_setting('sellervate.voltra_brand')::uuid,
+          'a0000000-0000-4000-8000-000000000001', 4, '2020-01-01');
+  raise exception 'FAIL: created_at set by the client';
+exception when insufficient_privilege then
+  raise notice 'ok: a review cannot be backdated';
+end $$;
+reset role;
+
+-- Marta tags a review with a retired issue type.
+update public.issue_types set active = false where code = 'slow';
+set local role authenticated;
+do $$
+begin
+  insert into public.review_issues (review_id, issue_code)
+  select id, 'slow' from public.reviews
+  where reviewer_id = 'a0000000-0000-4000-8000-000000000001'
+    and id not in (select review_id from public.review_issues where issue_code = 'slow')
+  limit 1;
+  raise exception 'FAIL: retired issue type added';
+exception when insufficient_privilege then
+  raise notice 'ok: retired issue types cannot be added';
+end $$;
+reset role;
+
+-- Leo leaves Hebra: Nuria still sees who wrote his old Hebra replies.
+delete from public.brand_memberships
+where user_id = 'a0000000-0000-4000-8000-000000000004' and brand_id = 'b0000000-0000-4000-8000-000000000003';
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+declare
+  missing int;
+begin
+  select count(*) into missing from public.replies r
+  where not exists (select 1 from public.profiles p where p.id = r.specialist_id);
+  if missing > 0 then raise exception 'FAIL: % replies without a visible author', missing; end if;
+  raise notice 'ok: a lead still sees the author after they leave the brand';
+end $$;
+reset role;
+
+-- A security definer function created later in public is not callable by anon.
+create function public.zz_rls_matrix_probe() returns int language sql security definer as $$ select 1 $$;
+do $$
+begin
+  if has_function_privilege('anon', 'public.zz_rls_matrix_probe()', 'execute') then
+    raise exception 'FAIL: anon can execute a new function in public';
+  end if;
+  raise notice 'ok: new functions are not executable by anon';
+end $$;
+
 rollback;

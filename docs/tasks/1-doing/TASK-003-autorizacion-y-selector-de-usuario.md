@@ -97,6 +97,16 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 
 ## Notas de implementación
 
+### 2026-09-23 · Subagentes (antes del PR)
+- `security-reviewer` y `code-reviewer`: nada bloqueante. Menores: `/api/demo-session` sin zod (zod entra en TASK-004; la lista cerrada de 5 claves hace de whitelist) y sin rate limiting (no hay credenciales que adivinar).
+- `tenant-isolation-reviewer`: sin fugas. Arreglado en la migración, que todavía no se había subido:
+  1. `alter default privileges … in schema public revoke execute … from public` no hacía nada, porque un revoke por esquema no quita un default global. Una función `security definer` nueva en `public` quedaba ejecutable por `anon` vía `/rest/v1/rpc`. Ahora hay un revoke global.
+  2. Si un especialista deja la marca, el lead dejaba de ver su perfil y la API daba 500 (`r.specialist` null). Se agregó `authored_reply_in_led_brand` a la política de `profiles`.
+  3. El `insert` en `reviews` aceptaba `created_at`, `updated_at` e `id` del cliente. Ahora el insert también va con grant de columnas.
+  4. `review_issues` aceptaba etiquetas con `active = false`. Ahora el `with check` lo impide.
+  - Los cuatro quedaron como aserciones en `rls-matrix.sql`.
+  - El aviso para `/me` se anotó en TASK-005.
+
 ### 2026-09-23 · Implementación
 - **Helpers en el esquema `private`**, no en `public`: PostgREST no los expone como RPC. `authenticated` necesita `execute` igual, porque las políticas se evalúan con el rol de quien consulta (el ejemplo de la skill revoca `execute` a `authenticated`, y eso rompería todas las políticas).
 - **`issue_types_select` es `using (true)`**: es la única política incondicional. El catálogo es global y no tiene datos de ninguna marca. Queda explicado en la migración.

@@ -9,7 +9,8 @@
 -- Matrix (docs/PLAN.md § 3, TASK-003 grill Q4 and Q5):
 --   brands             members of the brand
 --   brand_memberships  your own rows, plus every row of the brands you lead
---   profiles           yourself, plus anyone who shares a brand with you
+--   profiles           yourself, anyone who shares a brand with you, and the
+--                      authors of replies in the brands you lead
 --   replies            the author, plus the leads of the reply's brand
 --   reviews            the leads of the brand, plus the author of the reviewed reply
 --   review_issues      whoever can read the parent review
@@ -78,12 +79,30 @@ as $$
   );
 $$;
 
+-- True when target_user wrote a reply in a brand the caller leads, even if they
+-- are no longer a member of it.
+create function private.authored_reply_in_led_brand(target_user uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1
+    from public.replies r
+    join public.brand_memberships m on m.brand_id = r.brand_id
+    where r.specialist_id = target_user
+      and m.user_id = (select auth.uid()) and m.role = 'lead'
+  );
+$$;
+
 -- Postgres grants execute to PUBLIC by default. Policies are evaluated as the
 -- calling role, so authenticated needs execute; anon never does.
 revoke execute on function private.is_member_of(uuid), private.is_lead_of(uuid),
-  private.shares_brand_with(uuid) from public, anon;
+  private.shares_brand_with(uuid), private.authored_reply_in_led_brand(uuid) from public, anon;
 grant execute on function private.is_member_of(uuid), private.is_lead_of(uuid),
-  private.shares_brand_with(uuid) to authenticated;
+  private.shares_brand_with(uuid), private.authored_reply_in_led_brand(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Table privileges
@@ -92,16 +111,22 @@ grant execute on function private.is_member_of(uuid), private.is_lead_of(uuid),
 -- Supabase grants every privilege on public tables to anon and authenticated and
 -- leaves the filtering to RLS. Narrow it: anon (no session) reads nothing, and
 -- authenticated cannot truncate (RLS does not apply to truncate), reference or
--- add triggers. Tables with no write policy also lose insert/update/delete, so a
--- missing policy is not the only thing standing between a user and a write.
+-- add triggers. The tables below that have no write policy also lose
+-- insert/update/delete, so a missing policy is not the only thing standing
+-- between a user and a write. That last part only covers today's tables: a new
+-- table still grants writes to authenticated and relies on RLS being enabled in
+-- its own migration (a project rule).
 revoke all on all tables in schema public from anon;
 revoke truncate, references, trigger on all tables in schema public from authenticated;
 revoke insert, update, delete on public.profiles, public.brands, public.brand_memberships,
   public.replies, public.issue_types, public.brand_events from authenticated;
 
--- Reviews: a lead may change the judgement, never what it is attached to.
--- Column grants make reply_id, brand_id and reviewer_id immutable through the API.
-revoke update, delete on public.reviews from authenticated;
+-- Reviews: a lead may change the judgement, never what it is attached to, and
+-- never its timestamps. Column grants make reply_id, brand_id and reviewer_id
+-- immutable, and keep id, created_at and updated_at out of the client's hands on
+-- insert too (a backdated created_at would skew "reviewed this week").
+revoke insert, update, delete on public.reviews from authenticated;
+grant insert (reply_id, brand_id, reviewer_id, score, comment, is_exemplar) on public.reviews to authenticated;
 grant update (score, comment, is_exemplar) on public.reviews to authenticated;
 
 -- review_issues rows are added and removed, never edited.
@@ -112,8 +137,17 @@ alter default privileges for role postgres in schema public
   revoke all on tables from anon;
 alter default privileges for role postgres in schema public
   revoke truncate, references, trigger on tables from authenticated;
+-- Two statements because they undo two different defaults: Supabase grants
+-- execute to anon per schema, and Postgres grants it to PUBLIC globally. A
+-- schema-scoped revoke cannot remove a global default, so without the second
+-- line a new security definer function in public would be callable by anyone
+-- through /rest/v1/rpc with the anon key. Side effect: functions that extensions
+-- installed later create as postgres also lose the PUBLIC grant and need an
+-- explicit one.
 alter default privileges for role postgres in schema public
-  revoke execute on functions from anon, public;
+  revoke execute on functions from anon;
+alter default privileges for role postgres
+  revoke execute on functions from public;
 
 -- ---------------------------------------------------------------------------
 -- Read policies
@@ -127,9 +161,16 @@ create policy brand_memberships_select on public.brand_memberships
   for select to authenticated
   using (user_id = (select auth.uid()) or private.is_lead_of(brand_id));
 
+-- authored_reply_in_led_brand covers a specialist who has left the brand: their old
+-- replies stay in the lead's queue and history, and without it the author's
+-- name would come back null (and the API would 500).
 create policy profiles_select on public.profiles
   for select to authenticated
-  using (id = (select auth.uid()) or private.shares_brand_with(id));
+  using (
+    id = (select auth.uid())
+    or private.shares_brand_with(id)
+    or private.authored_reply_in_led_brand(id)
+  );
 
 -- A specialist sees their own replies in every brand; a lead sees every reply of
 -- the brands they lead. Nobody sees a reply only because they share a brand
@@ -183,6 +224,8 @@ create policy reviews_update on public.reviews
   using (reviewer_id = (select auth.uid()) and private.is_lead_of(brand_id))
   with check (reviewer_id = (select auth.uid()) and private.is_lead_of(brand_id));
 
+-- Retired issue types (active = false) stay on old reviews but cannot be added
+-- to new ones.
 create policy review_issues_insert on public.review_issues
   for insert to authenticated
   with check (
@@ -191,6 +234,10 @@ create policy review_issues_insert on public.review_issues
       where rv.id = review_id
         and rv.reviewer_id = (select auth.uid())
         and private.is_lead_of(rv.brand_id)
+    )
+    and exists (
+      select 1 from public.issue_types it
+      where it.code = issue_code and it.active
     )
   );
 

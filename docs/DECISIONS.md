@@ -26,6 +26,9 @@ _TBD._
 | `react-hook-form-zod`, `rhf-form-config` | community / own | Review form: one zod schema shared by client and server action |
 | `dataviz` | built-in | Weekly trend chart |
 | `frontend-design`, `accessibility` | anthropics/skills / community | Visual direction, keyboard and screen-reader checks |
+| `grill-me` / `grilling` | own | Stress-testing a task's open decisions before starting it |
+
+**Task board** (`docs/tasks/`): every PR starts as a task file (what is expected, acceptance criteria, out of scope, tenant-isolation risks, how to validate) and moves through `0-backlog → 1-doing → 2-testing → 3-done` with its branch and PR. Bugs found inside a task's scope are fixed there and noted; bugs outside it become their own task. The files are the agent's working memory across sessions and a record of what was decided and why.
 
 **Review subagents** (`.claude/agents/`, committed): before each PR is opened, read-only subagents check the diff. `code-reviewer` (Sonnet) looks for bugs and convention drift. `security-reviewer` (Sonnet) runs an OWASP-style pass on auth and input. `tenant-isolation-reviewer` (Opus) checks RLS, views and server checks against the role matrix, querying the local database as each seed user where it can. Tenant isolation gets the stronger model because a leak there costs a brand account. Their findings feed the human review on GitHub and do not replace it.
 

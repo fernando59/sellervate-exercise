@@ -1,7 +1,7 @@
 ---
 id: TASK-002
 titulo: Esquema, seed creíble y levantar todo con pnpm bootstrap
-estado: testing
+estado: done
 prioridad: alta
 estimacion: 60
 creada: 2026-09-23
@@ -10,7 +10,7 @@ rama: feat/schema-seed
 pr: https://github.com/fernando59/sellervate-exercise/pull/2
 tags: [db, seed]
 depende_de: [TASK-001]
-bloqueada_por: review del usuario en el PR2
+bloqueada_por:
 ---
 
 # TASK-002 · Esquema, seed creíble y levantar todo con pnpm bootstrap
@@ -77,6 +77,9 @@ Hecho.
 No editar la migración una vez mergeada: cualquier cambio posterior va en una migración nueva.
 
 ## Notas de implementación
+
+### 2026-09-23 · Mergeado sin review escrita
+El PR2 se mergeó sin comentarios del usuario en GitHub. Dos commits de logs de sesión quedaron en la rama después del merge y entran a `main` con `feat/authz`.
 
 ### 2026-09-23 · reviews → replies pasa a restrict
 Bug dentro del alcance, encontrado revisando los `on delete`: la FK hacía `cascade`, así que borrar una respuesta borraba sus reseñas sin avisar. Arreglado en `ec7d190` (migración editada en el lugar porque no estaba mergeada).

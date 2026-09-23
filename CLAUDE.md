@@ -123,7 +123,7 @@ Actualizar esta lista cada vez que se mergea un PR.
 
 - Repo: https://github.com/fernando59/sellervate-exercise (público; solo merge commits)
 - [ ] PR1 `chore/scaffold`: abierto, pendiente de review del usuario (https://github.com/fernando59/sellervate-exercise/pull/1)
-- [ ] PR2 `feat/schema-seed`
+- [ ] PR2 `feat/schema-seed` (incluye `pnpm setup`, ver sección 11 del plan)
 - [ ] PR3 `feat/authz`
 - [ ] PR4 `feat/review-queue`
 - [ ] PR5 `feat/my-feedback`

@@ -82,7 +82,9 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 - `server/auth/demo-users.ts`: las 5 personas del seed (email, nombre, etiqueta de rol). La contraseña sale de `DEMO_USER_PASSWORD` (solo servidor); si falta, el selector se desactiva. `bootstrap` agrega la variable a `.env.local` si no está.
 - Server action del selector: `signInWithPassword` **del lado del servidor**.
 - `/` sin sesión: las 5 personas con su rol; la cabecera dice "Choose a person". Sin login automático.
-- `app/api/brands/[slug]/replies/route.ts`: 401 sin sesión; 403 si la marca no existe o no eres miembro (indistinguibles).
+- `app/api/brands/[slug]/replies/route.ts`: 401 sin sesión; 403 si la marca no existe o no eres miembro (indistinguibles). Devuelve solo los campos de Q13.
+- `app/api/demo-session/route.ts` (`POST`, `{ person }`): el mismo login que el selector, para el `curl` del README.
+- "Sign out" en el selector; al cambiar de persona, `router.refresh()` en la misma página.
 - Reemplazar `#user-switcher-slot`.
 - `supabase/tests/rls-matrix.sql`: cuántas filas de cada tabla ve cada persona, para correr a mano con psql.
 
@@ -113,4 +115,9 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 - **Q9:** una marca que no existe responde 403, igual que una ajena.
 - **Q10:** script `supabase/tests/rls-matrix.sql`, además de pegar la salida en el PR.
 
-Pendiente para la ronda 2: a dónde redirigir después de elegir persona, cerrar sesión, qué campos devuelve la API y si la reseña se guarda con una función `save_review` transaccional (condiciona Q5).
+### 2026-09-23 · Grill, ronda 2 (decidido)
+- **Q11 después de elegir persona:** se queda en la misma página y se recarga con la nueva sesión, para ver el aislamiento en el momento. Redirigir según el rol queda para TASK-004.
+- **Q12:** "Sign out" al final del selector; vuelve a `/`.
+- **Q13 campos de la API:** `id`, `external_id`, `subject`, `specialist` (`id` y nombre), `sent_at` y `score` (`null` si no está reseñada). Sin textos de mensajes.
+- **Q14 guardar reseña:** función `save_review(...)` con `security invoker`, transaccional, que deriva `brand_id` de `replies`. Se escribe en TASK-004; las políticas de esta tarea tienen que permitirla.
+- **Q15 curl del README:** `POST /api/demo-session` con `{ "person": "dani" }`, que reutiliza el login del selector (cookie jar con `curl -c` / `-b`). Cambia el "único route handler" del plan: actualizar `docs/PLAN.md` § 5 en el PR de esta tarea.

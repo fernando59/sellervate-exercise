@@ -85,4 +85,6 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ## Notas de implementación
 
-(vacío — no empezada)
+### 2026-09-23 · Decidido en el grill de TASK-003
+- La reseña se guarda con una función `save_review(reply_id, score, comment, is_exemplar, issue_codes[])`, con `security invoker`, en una sola transacción. Deriva `brand_id` de `replies`; no lo recibe como parámetro. Las políticas y los grants vienen de TASK-003 (Q5, Q14).
+- `/` con sesión puede redirigir según el rol (lead → `/review`); hasta ahora se queda en la página (Q11).

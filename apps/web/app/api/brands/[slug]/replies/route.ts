@@ -16,7 +16,7 @@ export async function GET(_request: NextRequest, ctx: RouteContext<"/api/brands/
   try {
     const user = await getCurrentUser();
     const membership = requireMember(user, slug);
-    const replies = await listBrandReplies(membership.brandId);
+    const replies = await listBrandReplies(membership.brandId, user.id);
     return Response.json(
       { brand: membership.slug, role: membership.role, replies },
       { headers: { "Cache-Control": "private, no-store" } },

@@ -1,4 +1,4 @@
-# Transcript de sesión — 03-reglas-agentes-schema-seed-y-tareas
+# Transcript de sesión — 03-reglas-y-agentes
 
 Exportado desde Claude Code. Mensajes del usuario y del asistente completos; las llamadas a herramientas aparecen resumidas en una línea y sus resultados se omiten. El log crudo está en el `.jsonl` de al lado.
 
@@ -830,4 +830,48 @@ Listo, tres cosas:
 bien, guarda esta conversacion que voy a limpiar el chat
 
 > 🔧 `Bash` — Re-export full session log with redaction and secret scan
+
+> 🔧 `Bash` — Redact local service keys from logs
+
+> 🔧 `Bash` — Commit and push updated session log
+
+
+### 🤖 Asistente
+
+Sí, se puede. Claude Code tiene un hook `SessionEnd`, que se dispara al hacer `/clear` y recibe la ruta del transcript. Primero guardo el estado para la próxima sesión y después lo configuro.
+
+> 🔧 `Bash` — Read existing project memory
+
+> 🔧 `Skill`
+
+> 🔧 `Bash` — Inspect settings, transcript title and log session ids
+
+> 🔧 `Write`
+
+> 🔧 `Bash` — Pipe-test the export hook with this session
+
+> 🔧 `Bash` — Re-test hook with Windows paths and check redaction
+
+> 🔧 `Bash` — Pipe-test hook with a real Windows transcript path
+
+
+### 🤖 Asistente
+
+Mi prueba armó mal la ruta por el escapado de las barras. La construyo con `path.join`.
+
+> 🔧 `Bash` — Pipe-test hook and verify redaction
+
+> 🔧 `Bash` — Show what unredacted matches remain
+
+> 🔧 `Edit`
+
+> 🔧 `Bash` — Re-run hook and confirm full key is redacted
+
+> 🔧 `Bash` — Debug why the JWT is not redacted
+
+> 🔧 `Bash` — Locate full-key occurrences
+
+> 🔧 `Write`
+
+> 🔧 `Bash` — Validate settings JSON, run exact hook command, check gitignore
 

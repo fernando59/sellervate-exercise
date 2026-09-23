@@ -59,6 +59,8 @@ Tiempo:
 - No pulir de más. Si falta tiempo, recortar según el orden de recorte del plan.
 
 Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuario reemplazado por `<redacted>`. Ojo: también aparece escapado dentro de comandos `sed`.
+- **Se exportan solos** al cerrar o limpiar la sesión: hook `SessionEnd` en `.claude/settings.local.json` → `.claude/hooks/export-session-log.mjs`. Los dos archivos son locales y no se commitean porque tienen el email. El hook redacta el email, las claves `sb_secret_…` y cualquier JWT de `service_role`. Si la sesión ya tenía log, lo sobrescribe; si no, crea el `NN` siguiente con el nombre de la rama.
+- **El hook no commitea.** Al empezar una sesión, si `git status` muestra `ai-logs/` modificado o nuevo, el agente lo commitea (`docs: session log …`) en la rama de la tarea en curso.
 
 ## No negociables
 

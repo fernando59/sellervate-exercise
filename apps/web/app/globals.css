@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens.
+ *
+ * Colour: sage-tinted neutrals so the page reads calm for long reading sessions,
+ * and one ink-blue accent (the reviewer's pen) reserved for actions and selection.
+ * Semantic colours (good / warn / bad) encode review outcomes and issue severity
+ * and are never used as decoration.
+ *
+ * Type: Instrument Sans for UI and the replies being read, Bricolage Grotesque for
+ * the few headings, JetBrains Mono for scores, dates and ticket ids.
+ * Scale (rem): 0.75 / 0.8125 / 0.875 / 1 / 1.25 / 1.5 / 2.
+ */
+:root {
+  --ground: #f4f5f2;
+  --surface: #ffffff;
+  --sunken: #eceee9;
+  --ink: #16201c;
+  --ink-muted: #5b6660;
+  --line: #dce1da;
+  --line-strong: #c3cac1;
+
+  --accent: #2f4bc6;
+  --accent-ink: #ffffff;
+  --accent-soft: #e7ebfb;
+
+  --good: #1d7a4b;
+  --good-soft: #e3f2e9;
+  --warn: #a8690f;
+  --warn-soft: #fbf0dc;
+  --bad: #b3261e;
+  --bad-soft: #fbe6e4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ground: #101412;
+    --surface: #181d1b;
+    --sunken: #0c0f0e;
+    --ink: #e6ebe7;
+    --ink-muted: #9ba69f;
+    --line: #2b3430;
+    --line-strong: #3a4540;
+
+    --accent: #93a5ff;
+    --accent-ink: #0d1330;
+    --accent-soft: #1f2544;
+
+    --good: #5fcb93;
+    --good-soft: #15291f;
+    --warn: #e3aa52;
+    --warn-soft: #2e2412;
+    --bad: #f08a82;
+    --bad-soft: #321816;
+  }
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-instrument-sans), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Mono", monospace;
+
+  --text-2xs: 0.75rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.625rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 2rem;
+  --text-2xl: 2rem;
+  --text-2xl--line-height: 2.375rem;
+}
+
+@layer base {
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}

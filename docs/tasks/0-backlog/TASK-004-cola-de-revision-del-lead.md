@@ -87,4 +87,6 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ### 2026-09-23 · Decidido en el grill de TASK-003
 - La reseña se guarda con una función `save_review(reply_id, score, comment, is_exemplar, issue_codes[])`, con `security invoker`, en una sola transacción. Deriva `brand_id` de `replies`; no lo recibe como parámetro. Las políticas y los grants vienen de TASK-003 (Q5, Q14).
+- Regla "etiqueta crítica ⇒ nota ≤ 2": `refine` en el schema compartido y chequeo dentro de `save_review` (Q16).
+- Una respuesta de una marca ajena en una página → `notFound()`, no 403 (Q17).
 - `/` con sesión puede redirigir según el rol (lead → `/review`); hasta ahora se queda en la página (Q11).

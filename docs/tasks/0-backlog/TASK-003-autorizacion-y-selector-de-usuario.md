@@ -115,6 +115,10 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 - **Q9:** una marca que no existe responde 403, igual que una ajena.
 - **Q10:** script `supabase/tests/rls-matrix.sql`, además de pegar la salida en el PR.
 
+### 2026-09-23 · Grill, ronda 3 (decidido; grill cerrado)
+- **Q16 crítica ⇒ nota ≤ 2:** se aplica de verdad (`refine` de zod compartido + chequeo en `save_review`). Es de TASK-004.
+- **Q17 sin acceso en páginas:** `notFound()` (404, no revela que la marca existe); la API sigue con 403. Sin `experimental.authInterrupts`: en Next 16.3.5 `forbidden()` sigue siendo experimental. `server/auth` lanza errores tipados; cada capa los traduce.
+
 ### 2026-09-23 · Grill, ronda 2 (decidido)
 - **Q11 después de elegir persona:** se queda en la misma página y se recarga con la nueva sesión, para ver el aislamiento en el momento. Redirigir según el rol queda para TASK-004.
 - **Q12:** "Sign out" al final del selector; vuelve a `/`.

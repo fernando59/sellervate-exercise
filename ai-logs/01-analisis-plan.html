@@ -1,0 +1,720 @@
+<title>Plan Sellervate QA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F5F2; --surface:#FFFFFF; --ink:#16201C; --muted:#5B6660; --line:#DCE1DA;
+  --accent:#2F4BC6; --accent-soft:#E7EBFB; --good:#1D7A4B; --good-soft:#E3F2E9;
+  --warn:#A8690F; --warn-soft:#FBF0DC; --bad:#B3261E; --bad-soft:#FBE6E4;
+  --paper:#FFFFFF; --code:#EEF0EC;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#101412; --surface:#181D1B; --ink:#E6EBE7; --muted:#9BA69F; --line:#2B3430;
+    --accent:#93A5FF; --accent-soft:#1F2544; --good:#5FCB93; --good-soft:#15291F;
+    --warn:#E3AA52; --warn-soft:#2E2412; --bad:#F08A82; --bad-soft:#321816;
+    --paper:#F7F8F6; --code:#1F2522;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#101412; --surface:#181D1B; --ink:#E6EBE7; --muted:#9BA69F; --line:#2B3430;
+  --accent:#93A5FF; --accent-soft:#1F2544; --good:#5FCB93; --good-soft:#15291F;
+  --warn:#E3AA52; --warn-soft:#2E2412; --bad:#F08A82; --bad-soft:#321816;
+  --paper:#F7F8F6; --code:#1F2522;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;padding:0 20px}
+.wrap{max-width:1040px;margin:0 auto;padding-block:40px 80px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.75rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0;max-width:68ch}
+.eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.15rem;color:var(--muted);max-width:62ch}
+.muted{color:var(--muted)}
+header.top{display:grid;gap:14px;padding-bottom:28px;border-bottom:1px solid var(--line)}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+nav.toc a{font-family:var(--mono);font-size:.8rem;color:var(--ink);text-decoration:none;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+section{display:grid;gap:18px;padding-block:44px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.sec-head{display:grid;gap:6px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:8px;align-content:start}
+.card.pick{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.paper{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto;color:#16201C}
+.tag{display:inline-block;font-family:var(--mono);font-size:.72rem;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tag.ok{background:var(--good-soft);color:var(--good);border-color:transparent}
+.tag.no{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.tag.mid{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.tag.acc{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+ul.clean{margin:0;padding-left:1.1em;display:grid;gap:6px}
+ul.clean li{max-width:66ch}
+.callout{background:var(--accent-soft);border-radius:10px;padding:16px 18px;display:grid;gap:6px}
+.callout.warn{background:var(--warn-soft)}
+.callout.bad{background:var(--bad-soft)}
+.callout strong{font-family:var(--display)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--ground)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--mono)}
+pre.code{background:var(--code);border-radius:10px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;line-height:1.55;margin:0;color:var(--ink)}
+code{font-family:var(--mono);font-size:.88em;background:var(--code);padding:1px 5px;border-radius:4px}
+pre.code code{background:none;padding:0}
+.quote{border-left:3px solid var(--accent);padding:4px 0 4px 14px;color:var(--muted);font-style:italic;max-width:66ch}
+.timeline{display:grid;gap:8px}
+.tl-row{display:grid;grid-template-columns:150px 1fr 64px;gap:12px;align-items:center;font-size:.9rem}
+.tl-bar{height:22px;border-radius:5px;background:var(--accent-soft);position:relative}
+.tl-bar span{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--accent)}
+.tl-bar.doc span{background:var(--warn)}
+.tl-bar.buf span{background:var(--muted);opacity:.45}
+.tl-row .t{font-family:var(--mono);font-size:.8rem;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.tl-row{grid-template-columns:1fr 56px}.tl-row .tl-bar{grid-column:1 / -1;grid-row:2}}
+/* wireframe */
+.wf{display:grid;grid-template-columns:230px 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);font-size:.85rem;min-width:640px}
+.wf-scroll{overflow-x:auto}
+.wf-side{border-right:1px solid var(--line);background:var(--ground);display:grid;align-content:start}
+.wf-side .h{padding:10px 12px;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+.wf-item{padding:10px 12px;border-bottom:1px solid var(--line);display:grid;gap:2px}
+.wf-item.on{background:var(--surface);box-shadow:inset 3px 0 0 var(--accent)}
+.wf-item small{color:var(--muted)}
+.wf-main{padding:16px;display:grid;gap:12px}
+.bubble{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:4px}
+.bubble.cust{background:var(--ground)}
+.bubble .who{font-family:var(--mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.scores{display:flex;gap:6px;flex-wrap:wrap}
+.scores b{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-weight:500}
+.scores b.sel{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.wf-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{background:var(--accent);color:var(--surface);border-radius:6px;padding:6px 14px;font-weight:600;font-size:.85rem}
+.kbd{font-family:var(--mono);font-size:.72rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--muted)}
+svg text{font-family:var(--mono)}
+.chart-wrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.check li{list-style:none;position:relative;padding-left:1.6em}
+.check li::before{content:"";position:absolute;left:0;top:.45em;width:.8em;height:.8em;border:1.5px solid var(--accent);border-radius:3px}
+.check{padding-left:0 !important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <span class="eyebrow">Sellervate · ejercicio técnico · plan de trabajo</span>
+  <h1>Control de calidad de respuestas, en 6 horas</h1>
+  <p class="lede">Qué problema hay, qué vamos a construir (y qué no), cómo se modelan los datos, dónde se aplica la autorización y el orden exacto de pull requests con presupuesto de tiempo.</p>
+  <nav class="toc" aria-label="Secciones">
+    <a href="#problema">Problema</a><a href="#lectura">Qué construir</a><a href="#roles">Quién ve qué</a>
+    <a href="#pantallas">Pantallas</a><a href="#arquitectura">Arquitectura</a><a href="#datos">Modelo de datos</a><a href="#authz">Autorización</a>
+    <a href="#prs">Plan de PRs</a><a href="#review">Qué revisar</a><a href="#seed">Seed</a><a href="#decisions">DECISIONS.md</a>
+  </nav>
+</header>
+
+<!-- 1 PROBLEMA -->
+<section id="problema">
+  <div class="sec-head">
+    <span class="eyebrow">El problema</span>
+    <h2>Sellervate vende calidad de respuesta, pero hoy no la mide</h2>
+    <p class="muted">El cliente final cree que habla con la marca. En realidad le responde un especialista de Sellervate que cubre 2 o 3 marcas al día, y cada una tiene reglas distintas.</p>
+  </div>
+
+  <div class="paper">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','flowchart':{'curve':'basis'}}}%%
+flowchart LR
+  C["Cliente final<br/>(cree hablar con la marca)"] -->|escribe| H["Helpdesk de la marca"]
+  S["Especialista<br/>(Dani: Voltra + Boxwell)"] -->|responde con la voz de la marca| H
+  H -.->|ayer salieron ~30| L["Team lead<br/>(Marta)"]
+  L -->|lee ~5 por encima| X{{"¿Estuvo bien?"}}
+  X -->|"algo raro"| SL["Mensaje por Slack"]
+  SL -.->|se pierde| V(("Sin registro"))
+  V --> P1["No hay coaching"]
+  V --> P2["No hay datos para el cliente"]
+  V --> P3["Errores detectados tarde<br/>(los descubre la marca)"]
+  classDef bad fill:#FBE6E4,stroke:#B3261E,color:#16201C;
+  class V,P1,P2,P3 bad;
+</pre>
+  </div>
+
+  <div class="grid3">
+    <div class="card"><span class="tag mid">misma persona, otro trabajo</span><h3>El estándar depende de la marca</h3><p class="muted">Patinetes: diagnosticar antes de ofrecer la devolución. Packaging: rápido, exacto, 3 líneas. Un mismo párrafo puede ser excelente para una marca y pésimo para otra.</p></div>
+    <div class="card"><span class="tag no">no todo error pesa igual</span><h3>La gravedad importa</h3><p class="muted">Un tono algo desviado molesta. Decirle al cliente algo incorrecto sobre su producto hace perder la cuenta. El modelo tiene que distinguir esos casos.</p></div>
+    <div class="card"><span class="tag acc">visión parcial</span><h3>Nadie ve el panorama entero</h3><p class="muted">Marta cubre 4 marcas y Nuria las otras 2. Un especialista pasó un mes cerrando tickets sin revisar el historial de pedidos y lo descubrió la marca.</p></div>
+  </div>
+
+  <div class="callout">
+    <strong>La herramienta en una frase</strong>
+    <p>Un lugar donde el team lead deja constancia de su juicio sobre respuestas ya enviadas y el especialista lo lee. Con el tiempo, esos juicios se convierten en tendencia (para el cliente) y en ejemplos (para el onboarding).</p>
+  </div>
+  <div class="callout bad">
+    <strong>Qué no es</strong>
+    <p>No es un helpdesk, ni un inbox, ni tickets, ni un producto de IA. Nada de scoring automático: si un modelo encaja, se describe en un párrafo en DECISIONS.md.</p>
+  </div>
+</section>
+
+<!-- 2 LECTURA -->
+<section id="lectura">
+  <div class="sec-head">
+    <span class="eyebrow">La decisión que leen primero</span>
+    <h2>Qué lectura elegir: revisión, con la prueba y el coaching como consecuencias baratas</h2>
+    <p class="muted">Sin reseñas guardadas no existen ni tendencia ni biblioteca. Ambas son consultas sobre la misma tabla. Por eso el núcleo es el bucle de revisión, y de las otras dos lecturas construimos solo la versión mínima que sale casi gratis.</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card pick"><span class="tag acc">construir bien</span><h3>Revisión</h3><p class="muted">Cola de respuestas de ayer → nota 1–5 → etiquetas de problema con gravedad → comentario. Rápido y consistente, con atajos de teclado. El especialista lo lee en "Mi feedback".</p></div>
+    <div class="card"><span class="tag mid">versión mínima</span><h3>Prueba</h3><p class="muted">Página de marca con la media semanal y los problemas más frecuentes. Es un <code>GROUP BY</code> sobre las reseñas. Sin exportación ni PDF.</p></div>
+    <div class="card"><span class="tag">fuera (o extra si sobra tiempo)</span><h3>Coaching</h3><p class="muted">El modelo lo deja preparado (un flag <code>is_exemplar</code> en la reseña), pero no se construye la biblioteca. Queda explicado en DECISIONS.md.</p></div>
+  </div>
+
+  <div class="paper">
+<pre class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+  R["replies<br/>(respuestas enviadas)"] --> RV["reviews<br/>nota + etiquetas + comentario"]
+  RV --> A["Mi feedback<br/>(especialista)"]
+  RV --> B["Tendencia por marca<br/>(prueba, mínima)"]
+  RV -.-> C["Biblioteca de ejemplos<br/>(coaching, V2)"]
+  I["Importación desde helpdesk<br/>(futuro)"] -.-> R
+  classDef core fill:#E7EBFB,stroke:#2F4BC6,color:#16201C;
+  classDef later fill:#fff,stroke:#999,stroke-dasharray:4 3,color:#555;
+  class RV,A core; class C,I later;
+</pre>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>Lo que dejamos fuera, y por qué</h3>
+      <ul class="clean">
+        <li><b>Login real</b>: lo permiten simular y no aporta señal.</li>
+        <li><b>Importación del helpdesk</b>: "ahora no". El modelo lo prepara con <code>source</code> + <code>external_id</code>.</li>
+        <li><b>Scoring con IA</b>: explícitamente es lo equivocado.</li>
+        <li><b>Calibración entre leads, notificaciones, exportes</b>: son V2.</li>
+        <li><b>Biblioteca de coaching</b>: solo el flag en el modelo.</li>
+      </ul>
+    </div>
+    <div class="card"><h3>Supuestos que hay que escribir</h3>
+      <ul class="clean">
+        <li>Una reseña por respuesta y por revisor.</li>
+        <li>El tiempo de respuesta se <i>calcula</i> (<code>sent_at − received_at</code>), no se juzga.</li>
+        <li>Las etiquetas de problema son un catálogo global con gravedad. Las marcas no las personalizan en V1.</li>
+        <li>El especialista solo ve sus propias respuestas reseñadas, en todas sus marcas.</li>
+        <li>El lead ve todo lo de las marcas que lidera y nada de las demás.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 3 ROLES -->
+<section id="roles">
+  <div class="sec-head">
+    <span class="eyebrow">Tenancy</span>
+    <h2>Quién ve qué</h2>
+    <p class="muted">La marca es el tenant. El rol no es global: es <b>por marca</b> (tabla <code>brand_memberships</code>). Esta matriz es la que tiene que aplicarse en el servidor.</p>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Acción</th><th>Marta<br/>lead Voltra + Boxwell</th><th>Nuria<br/>lead Hebra</th><th>Dani<br/>esp. Voltra + Boxwell</th><th>Leo<br/>esp. Voltra + Hebra</th></tr></thead>
+      <tbody>
+        <tr><td>Ver respuestas de Voltra</td><td><span class="tag ok">todas</span></td><td><span class="tag no">no</span></td><td><span class="tag mid">solo las suyas</span></td><td><span class="tag mid">solo las suyas</span></td></tr>
+        <tr><td>Calificar una respuesta de Voltra</td><td><span class="tag ok">sí</span></td><td><span class="tag no">no</span></td><td><span class="tag no">no</span></td><td><span class="tag no">no</span></td></tr>
+        <tr><td>Ver notas de otro especialista</td><td><span class="tag ok">en sus marcas</span></td><td><span class="tag ok">en Hebra</span></td><td><span class="tag no">no</span></td><td><span class="tag no">no</span></td></tr>
+        <tr><td>Ver la tendencia de la marca</td><td><span class="tag ok">Voltra, Boxwell</span></td><td><span class="tag ok">Hebra</span></td><td><span class="tag mid">solo la propia</span></td><td><span class="tag mid">solo la propia</span></td></tr>
+        <tr><td>Leer el comentario sobre su respuesta</td><td>—</td><td>—</td><td><span class="tag ok">sí</span></td><td><span class="tag ok">sí</span></td></tr>
+        <tr><td><code>GET /api/brands/hebra/…</code></td><td><span class="tag no">403</span></td><td><span class="tag ok">200</span></td><td><span class="tag no">403</span></td><td><span class="tag mid">200, filtrado</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn">
+    <strong>Trampa típica: los agregados</strong>
+    <p>Una "media del equipo" que se le enseña al especialista es una fuga de datos de otros especialistas, aunque no muestre nombres. Decide explícitamente si la muestras y escríbelo.</p>
+  </div>
+</section>
+
+<!-- 4 PANTALLAS -->
+<section id="pantallas">
+  <div class="sec-head">
+    <span class="eyebrow">Superficie mínima conectada</span>
+    <h2>Cuatro pantallas y un selector de usuario</h2>
+  </div>
+  <div class="grid2">
+    <div class="card"><span class="tag acc">lead</span><h3>1 · Cola de revisión</h3><p class="muted">Respuestas de ayer de sus marcas, con filtros por marca y por "sin reseñar". Es la pantalla principal.</p></div>
+    <div class="card"><span class="tag acc">lead</span><h3>2 · Marca</h3><p class="muted">Media semanal, problemas más frecuentes por gravedad, tabla por especialista y últimas reseñas.</p></div>
+    <div class="card"><span class="tag ok">especialista</span><h3>3 · Mi feedback</h3><p class="muted">Sus respuestas reseñadas con la nota, las etiquetas y el comentario. Su media por marca.</p></div>
+    <div class="card"><span class="tag">ambos</span><h3>4 · Detalle de respuesta</h3><p class="muted">Mensaje del cliente, respuesta enviada, contexto de la marca (sus reglas) y la reseña.</p></div>
+  </div>
+
+  <h3>Boceto de la cola de revisión</h3>
+  <div class="wf-scroll">
+  <div class="wf" role="img" aria-label="Boceto de la pantalla de revisión">
+    <div class="wf-side">
+      <div class="h">Ayer · 31 respuestas · 4 reseñadas</div>
+      <div class="wf-item on"><b>Voltra · #48213</b><small>Dani · "El patinete no enciende"</small></div>
+      <div class="wf-item"><b>Boxwell · #9921</b><small>Sara · "Factura del pedido 3302"</small></div>
+      <div class="wf-item"><b>Voltra · #48240</b><small>Leo · "Ruido en la rueda trasera"</small> <span class="tag ok">4</span></div>
+      <div class="wf-item"><b>Boxwell · #9930</b><small>Dani · "Cambio de medida de caja"</small></div>
+    </div>
+    <div class="wf-main">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="tag acc">Voltra</span><span class="muted">Regla de la marca: diagnosticar antes de ofrecer devolución · 1.ª respuesta en 3 h 12 min</span></div>
+      <div class="bubble cust"><span class="who">Cliente</span>Mi Voltra S2 no enciende desde ayer. Lo cargué toda la noche. ¿Me lo cambian?</div>
+      <div class="bubble"><span class="who">Enviado por Dani</span>¡Hola! Lamentamos lo ocurrido. Ya hemos generado la etiqueta de devolución, recibirás un reemplazo en 5–7 días.</div>
+      <div><b>Nota</b> <span class="kbd">1</span>–<span class="kbd">5</span></div>
+      <div class="scores"><b>1</b><b class="sel">2</b><b>3</b><b>4</b><b>5</b></div>
+      <div class="chips"><span class="tag no">No diagnosticó · grave</span><span class="tag">Tono</span><span class="tag">Respondió otra cosa</span><span class="tag">No revisó el pedido</span><span class="tag">Lenta</span></div>
+      <div class="bubble cust" style="color:var(--muted)">Comentario: en Voltra, "no enciende" suele ser el bloqueo de batería. Antes del reemplazo, pedir que mantenga pulsado 10 s…</div>
+      <div class="wf-foot"><span class="muted"><span class="kbd">J</span>/<span class="kbd">K</span> anterior/siguiente</span><span class="btn">Guardar y siguiente</span></div>
+    </div>
+  </div>
+  </div>
+
+  <h3>Qué verá el cliente de la marca (datos de ejemplo)</h3>
+  <div class="chart-wrap">
+    <svg viewBox="0 0 640 270" width="100%" style="min-width:520px;display:block" role="img" aria-label="Media semanal de la nota por marca, datos de ejemplo">
+      <g stroke="var(--line)" stroke-width="1">
+        <line x1="50" y1="20" x2="560" y2="20"/><line x1="50" y1="86.7" x2="560" y2="86.7"/>
+        <line x1="50" y1="153.3" x2="560" y2="153.3"/><line x1="50" y1="220" x2="560" y2="220"/>
+      </g>
+      <g fill="var(--muted)" font-size="11" text-anchor="end">
+        <text x="40" y="24">5</text><text x="40" y="90.7">4</text><text x="40" y="157.3">3</text><text x="40" y="224">2</text>
+      </g>
+      <g fill="var(--muted)" font-size="11" text-anchor="middle">
+        <text x="50" y="244">S1</text><text x="148" y="244">S2</text><text x="246" y="244">S3</text>
+        <text x="344" y="244">S4</text><text x="442" y="244">S5</text><text x="540" y="244">S6</text>
+      </g>
+      <line x1="295" y1="20" x2="295" y2="220" stroke="var(--warn)" stroke-dasharray="4 4"/>
+      <text x="301" y="34" fill="var(--warn)" font-size="11">cambio: checklist de diagnóstico</text>
+      <polygon points="50,146.7 148,133.3 246,153.3 344,113.3 442,100 540,86.7 540,220 50,220" fill="var(--accent)" opacity=".08"/>
+      <polyline points="50,146.7 148,133.3 246,153.3 344,113.3 442,100 540,86.7" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+      <polyline points="50,73.3 148,80 246,66.7 344,73.3 442,60 540,66.7" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="1 0"/>
+      <circle cx="540" cy="86.7" r="4.5" fill="var(--accent)"/><text x="550" y="90.7" fill="var(--accent)" font-size="12">4.0</text>
+      <circle cx="540" cy="66.7" r="4" fill="var(--good)"/><text x="550" y="64" fill="var(--good)" font-size="12">4.3</text>
+    </svg>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Voltra (patinetes)</span><span><i style="background:var(--good)"></i>Boxwell (packaging)</span><span>Media semanal de la nota, 1–5 · datos inventados</span></div>
+  </div>
+  <p class="muted">Esto responde a "prefiero enseñar el número a decir la frase": la tendencia, el problema que se repite y qué cambiamos.</p>
+</section>
+
+<!-- ARQUITECTURA -->
+<section id="arquitectura">
+  <div class="sec-head">
+    <span class="eyebrow">Pesa 13 puntos · "¿podemos construir encima?"</span>
+    <h2>Arquitectura recomendada: un monolito Next.js por capas, con Postgres como guardián final</h2>
+    <p class="muted">Una sola app Next.js (App Router) que habla directo con Supabase. Sin backend aparte. La separación de responsabilidades la dan las capas dentro de la app, no los servicios.</p>
+  </div>
+
+  <div class="paper">
+<pre class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+flowchart TB
+  subgraph UI["app/ · rutas (Server Components)"]
+    P1["/review"]:::ui
+    P2["/brands/[slug]"]:::ui
+    P3["/me"]:::ui
+    API["/api/brands/[slug]/replies<br/>(route handler, JSON)"]:::ui
+  end
+  subgraph F["features/ · UI + server actions por dominio"]
+    RA["review/actions.ts<br/>saveReview()"]:::feat
+    RC["review/components/*"]:::feat
+  end
+  subgraph S["server/ · 'server-only'"]
+    AU["auth/session.ts<br/>getCurrentUser() · requireLeadOf() · requireMember()"]:::srv
+    DA["data/*.ts<br/>queries tipadas: listQueue, getBrandTrend, listMyFeedback"]:::srv
+    SB["supabase/server.ts<br/>cliente por request con el JWT del usuario"]:::srv
+  end
+  subgraph DB["supabase/ · Postgres"]
+    RLS["Políticas RLS + is_lead_of()"]:::db
+    T["Tablas · vistas de agregación"]:::db
+  end
+  P1 & P2 & P3 --> DA
+  P1 --> RC --> RA
+  RA --> AU
+  API --> AU
+  P2 --> AU
+  AU --> DA --> SB --> RLS --> T
+  classDef ui fill:#E7EBFB,stroke:#2F4BC6,color:#16201C;
+  classDef feat fill:#fff,stroke:#2F4BC6,color:#16201C;
+  classDef srv fill:#FBF0DC,stroke:#A8690F,color:#16201C;
+  classDef db fill:#E3F2E9,stroke:#1D7A4B,color:#16201C;
+</pre>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>Estructura del repo (monorepo)</h3>
+<pre class="code"><code>sellervate-qa/
+├─ apps/
+│  └─ web/                 # Next.js App Router + TS + Tailwind
+│     ├─ app/              # rutas: (lead)/review, brands/[slug], me, api/…
+│     ├─ features/         # review/, feedback/, brand-overview/
+│     │   └─ review/{components,actions.ts,schema.ts}
+│     ├─ server/           # import 'server-only'
+│     │   ├─ auth/session.ts
+│     │   ├─ data/{replies,reviews,trends}.ts
+│     │   └─ supabase/server.ts
+│     └─ ui/               # tokens, Button, EmptyState, Skeleton…
+├─ supabase/
+│  ├─ migrations/          # esquema + RLS (una migración por PR)
+│  ├─ seed.sql
+│  └─ tests/               # (V2) pgTAP para las políticas
+├─ docs/  DECISIONS.md · TIMELOG.md
+├─ ai-logs/                # prompts y sesiones
+└─ pnpm-workspace.yaml</code></pre>
+      <p class="muted"><code>apps/</code> deja sitio para un futuro <code>apps/ingest</code> (el importador del helpdesk) que reutilice el esquema y los tipos, sin reestructurar nada.</p>
+    </div>
+    <div class="card"><h3>Reglas de las capas</h3>
+      <ul class="clean">
+        <li><b>Lecturas</b> en Server Components llamando a <code>server/data</code>. Nunca Supabase desde el navegador.</li>
+        <li><b>Escrituras</b> con server actions: <code>getCurrentUser()</code> → <code>zod.parse</code> → <code>requireLeadOf(brandId)</code> → query.</li>
+        <li><code>brandId</code> <b>se deriva de la BD</b> (la respuesta a la que pertenece), nunca del body del formulario.</li>
+        <li><b>Un único route handler JSON</b> (<code>/api/brands/[slug]/replies</code>) para cumplir "si pedimos a la API otra marca, dice que no". Devuelve 403.</li>
+        <li><code>service_role</code> <b>solo en el script de seed</b>. La app usa siempre el JWT del usuario, así que RLS aplica siempre.</li>
+        <li>Páginas con datos por usuario = dinámicas. Nada de <code>unstable_cache</code> o <code>"use cache"</code> sin el usuario en la clave.</li>
+        <li>Tipos generados con <code>supabase gen types</code>, así la BD es la fuente de verdad.</li>
+        <li>Agregados (tendencia, top problemas) como <b>vistas SQL</b> con <code>security_invoker = on</code>, para que respeten RLS.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Alternativa</th><th>Por qué no ahora</th></tr></thead>
+      <tbody>
+        <tr><td>Backend aparte (NestJS / Express)</td><td>Duplica la autorización, un servicio más que levantar en el README y ~1 h que no hay. Supabase + RLS ya es la capa de datos segura. Sería razonable cuando llegue el importador o haya integraciones.</td></tr>
+        <tr><td>tRPC / React Query</td><td>Las server actions y los Server Components cubren lectura y escritura sin estado de cliente. Es menos código para revisar.</td></tr>
+        <tr><td>Turborepo + <code>packages/*</code></td><td>Todavía hay un solo consumidor. El workspace de pnpm basta, y <code>packages/db</code> aparece cuando exista <code>apps/ingest</code>.</td></tr>
+        <tr><td>Solo chequeos en Next (sin RLS)</td><td>Un olvido en una query es una fuga. Con RLS, el olvido devuelve vacío en lugar de datos ajenos.</td></tr>
+        <tr><td>Solo RLS (sin chequeo en Next)</td><td>Devuelve una lista vacía en lugar de "no". La UI no distingue "sin datos" de "sin permiso".</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+<pre class="code"><code>// apps/web/features/review/actions.ts
+'use server'
+export async function saveReview(input: unknown) {
+  const user = await getCurrentUser();                  // 401 si no hay sesión
+  const data = reviewSchema.parse(input);               // zod: score 1–5, issues[], comment
+  const reply = await getReplyForReview(data.replyId);  // RLS: null si no la puede ver
+  if (!reply) throw new NotFoundError();
+  await requireLeadOf(user, reply.brandId);             // 403 explícito
+  await insertReview({ ...data, brandId: reply.brandId, reviewerId: user.id });
+  revalidatePath('/review');
+}</code></pre>
+</section>
+
+<!-- 5 DATOS -->
+<section id="datos">
+  <div class="sec-head">
+    <span class="eyebrow">Pesa 12 puntos</span>
+    <h2>Modelo de datos</h2>
+    <p class="muted">Pensado para dos crecimientos anunciados: la importación desde el helpdesk y leads que cubren varias marcas.</p>
+  </div>
+  <div class="paper">
+<pre class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+erDiagram
+  profiles ||--o{ brand_memberships : "tiene"
+  brands ||--o{ brand_memberships : "tiene"
+  brands ||--o{ replies : "contiene"
+  profiles ||--o{ replies : "escribió (specialist_id)"
+  replies ||--o{ reviews : "recibe"
+  profiles ||--o{ reviews : "escribió (reviewer_id)"
+  reviews ||--o{ review_issues : ""
+  issue_types ||--o{ review_issues : ""
+  profiles { uuid id PK "= auth.users.id" text full_name }
+  brands { uuid id PK text slug UK text name text guidelines }
+  brand_memberships { uuid user_id PK,FK uuid brand_id PK,FK text role "lead | specialist" }
+  replies { uuid id PK uuid brand_id FK uuid specialist_id FK text source "seed | zendesk | gorgias" text external_id "UK con source" text subject text customer_message text reply_body timestamptz received_at timestamptz sent_at }
+  reviews { uuid id PK uuid reply_id FK uuid brand_id "FK compuesta con reply" uuid reviewer_id FK smallint score "1-5" text comment bool is_exemplar timestamptz created_at }
+  issue_types { text code PK text label text severity "minor | major | critical" bool active }
+  review_issues { uuid review_id PK,FK text issue_code PK,FK }
+</pre>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Decisiones que defienden el modelo</h3>
+      <ul class="clean">
+        <li><b>Rol por marca</b> (<code>brand_memberships</code>), no <code>profiles.role</code>. Un lead de 4 marcas no ve las otras 2.</li>
+        <li><b><code>unique(source, external_id)</code></b>: la futura importación hace <i>upsert</i> sin duplicar.</li>
+        <li><b><code>brand_id</code> desnormalizado en <code>reviews</code></b> con FK compuesta <code>(reply_id, brand_id) → replies(id, brand_id)</code>. RLS sin joins y sin poder mentir sobre la marca.</li>
+        <li><b><code>issue_types</code> como tabla</b>, no enum de Postgres. Añadir una categoría es un <code>INSERT</code>, no una migración. <code>active</code> en lugar de borrar.</li>
+        <li><b>Gravedad en el tipo de problema</b>: "información incorrecta" es crítica y "tono" es menor.</li>
+      </ul>
+    </div>
+    <div class="card"><h3>Qué se rompe primero al crecer</h3>
+      <ul class="clean">
+        <li>Tendencias calculadas en vivo sobre miles de reseñas: vista materializada o rollup semanal.</li>
+        <li>Una sola nota 1–5 no captura criterios por marca: rúbrica versionada por marca (<code>rubric_version</code>).</li>
+        <li>Dos leads calificando lo mismo: hace falta calibración.</li>
+        <li>Índices: <code>replies(brand_id, sent_at)</code>, <code>replies(specialist_id)</code>, <code>reviews(reply_id)</code>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6 AUTHZ -->
+<section id="authz">
+  <div class="sec-head">
+    <span class="eyebrow">Login simulado, autorización real</span>
+    <h2>Dónde se aplica la autorización</h2>
+    <p class="muted">Recomendación: <b>defensa en profundidad</b>. RLS en Postgres como garantía final y un chequeo explícito en el servidor de Next para devolver 403 (RLS por sí sola devuelve una lista vacía, y el enunciado pide que la API "diga que no").</p>
+  </div>
+  <div class="paper">
+<pre class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+sequenceDiagram
+  autonumber
+  participant B as Navegador
+  participant N as Next.js (server)
+  participant S as Supabase Auth
+  participant P as Postgres + RLS
+  B->>N: Selector: "ser Dani"
+  N->>S: signInWithPassword(dani@seed, pwd de seed)
+  S-->>N: sesión (JWT sub = Dani)
+  N-->>B: cookie de sesión httpOnly (@supabase/ssr)
+  B->>N: GET /api/brands/hebra/replies
+  N->>N: requireMembership(user, "hebra") → no es miembro
+  N-->>B: 403 Forbidden
+  B->>N: GET /brands/voltra (página)
+  N->>P: select replies (con el JWT de Dani, no service_role)
+  P->>P: policy: specialist_id = auth.uid() OR is_lead_of(brand_id)
+  P-->>N: solo las respuestas de Dani
+</pre>
+  </div>
+  <div class="grid2">
+    <div class="card"><span class="tag acc">recomendado</span><h3>A · Usuarios de seed reales en Supabase Auth</h3><p class="muted">El seed crea los usuarios en <code>auth.users</code> con contraseñas conocidas. El selector hace el login en el servidor. RLS usa <code>auth.uid()</code> de verdad. <b>Auth real después</b> = cambiar el selector por un formulario de login (o magic link/SSO). Las políticas no se tocan.</p></div>
+    <div class="card"><span class="tag">alternativa</span><h3>B · Firmar el JWT en el servidor</h3><p class="muted">Una cookie con el id elegido, y el servidor firma un JWT con el secreto del proyecto. Funciona, pero depende de la clave JWT legacy (las versiones nuevas de Supabase usan claves asimétricas) y es fácil de hacer mal. Úsala solo si A se complica.</p></div>
+  </div>
+<pre class="code"><code>-- Helper: evita recursión de RLS y centraliza la regla
+create function public.is_lead_of(b uuid) returns boolean
+language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from public.brand_memberships m
+                 where m.user_id = auth.uid() and m.brand_id = b and m.role = 'lead');
+$$;
+
+alter table public.replies enable row level security;
+create policy replies_read on public.replies for select to authenticated
+  using (specialist_id = auth.uid() or public.is_lead_of(brand_id));
+
+alter table public.reviews enable row level security;
+create policy reviews_read on public.reviews for select to authenticated
+  using (public.is_lead_of(brand_id)
+         or exists (select 1 from public.replies r
+                    where r.id = reply_id and r.specialist_id = auth.uid()));
+create policy reviews_write on public.reviews for insert to authenticated
+  with check (reviewer_id = auth.uid() and public.is_lead_of(brand_id));</code></pre>
+  <div class="callout warn">
+    <strong>Demuéstralo en el README</strong>
+    <p>Añade un <code>curl</code> con la cookie de Dani contra una marca ajena y el 403 esperado. Así el evaluador lo prueba en 10 segundos.</p>
+  </div>
+</section>
+
+<!-- 7 PRS -->
+<section id="prs">
+  <div class="sec-head">
+    <span class="eyebrow">Pesa 24 puntos, la dimensión más alta</span>
+    <h2>Plan de pull requests y presupuesto de tiempo</h2>
+    <p class="muted">Siete PRs pequeños, legibles en 5 minutos cada uno. Total planificado: 5 h 35 min, con 25 min de colchón.</p>
+  </div>
+
+  <div class="timeline" role="img" aria-label="Presupuesto de tiempo por pull request">
+    <div class="tl-row"><b>PR1 · Scaffold</b><div class="tl-bar"><span style="left:0;width:8.3%"></span></div><span class="t">30 min</span></div>
+    <div class="tl-row"><b>PR2 · Esquema + seed</b><div class="tl-bar"><span style="left:8.3%;width:13.9%"></span></div><span class="t">50 min</span></div>
+    <div class="tl-row"><b>PR3 · Auth + RLS</b><div class="tl-bar"><span style="left:22.2%;width:13.9%"></span></div><span class="t">50 min</span></div>
+    <div class="tl-row"><b>PR4 · Cola de revisión</b><div class="tl-bar"><span style="left:36.1%;width:16.7%"></span></div><span class="t">60 min</span></div>
+    <div class="tl-row"><b>PR5 · Mi feedback</b><div class="tl-bar"><span style="left:52.8%;width:8.3%"></span></div><span class="t">30 min</span></div>
+    <div class="tl-row"><b>PR6 · Página de marca</b><div class="tl-bar"><span style="left:61.1%;width:12.5%"></span></div><span class="t">45 min</span></div>
+    <div class="tl-row"><b>PR7 · Estados y pulido</b><div class="tl-bar"><span style="left:73.6%;width:6.9%"></span></div><span class="t">25 min</span></div>
+    <div class="tl-row"><b>DECISIONS + README</b><div class="tl-bar doc"><span style="left:80.5%;width:12.5%"></span></div><span class="t">45 min</span></div>
+    <div class="tl-row"><b>Colchón</b><div class="tl-bar buf"><span style="left:93%;width:7%"></span></div><span class="t">25 min</span></div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>PR</th><th>Rama</th><th>Contenido</th><th>Qué revisar con lupa</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>chore/scaffold</code></td><td>Next.js App Router + TS + Tailwind (+daisyUI), <code>supabase init</code>, tokens de diseño (tipografía y color), layout base, README esqueleto</td><td>Que no haya claves en el repo y que <code>.env.example</code> esté completo</td></tr>
+        <tr><td>2</td><td><code>feat/schema-seed</code></td><td>Migraciones de tablas + FKs + índices; <code>seed.sql</code> con marcas, usuarios y ~45 respuestas creíbles</td><td>FK compuesta, <code>unique(source, external_id)</code>, nada de enums rígidos, seed fuera de las migraciones</td></tr>
+        <tr><td>3</td><td><code>feat/authz</code></td><td>Usuarios de seed en Auth, selector de usuario, políticas RLS, <code>requireMembership()</code>, cliente Supabase por request</td><td><b>Uso de <code>service_role</code></b>, tablas sin RLS, políticas <code>using (true)</code>, <code>brand_id</code> leído del body</td></tr>
+        <tr><td>4</td><td><code>feat/review-queue</code></td><td>Cola del lead, detalle, formulario de reseña (server action + zod), atajos de teclado</td><td>Que el server action revalide la membresía, y validación del score</td></tr>
+        <tr><td>5</td><td><code>feat/my-feedback</code></td><td>Vista del especialista: sus reseñas y su media por marca</td><td>Agregados que filtren datos de otros especialistas</td></tr>
+        <tr><td>6</td><td><code>feat/brand-overview</code></td><td>Tendencia semanal, problemas más frecuentes y tabla por especialista</td><td>SQL de agregación correcto, semanas sin datos, caché de Next con datos por usuario</td></tr>
+        <tr><td>7</td><td><code>feat/states-polish</code></td><td>Estados vacío, de carga y de error diseñados; <code>loading.tsx</code>, <code>error.tsx</code>, <code>not-found.tsx</code></td><td>Probablemente "LGTM, merging"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>El ciclo de cada PR</h3>
+  <div class="paper">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','gitGraph':{'mainBranchName':'main'}}}%%
+gitGraph
+  commit id: "init"
+  branch feat/schema-seed
+  commit id: "agente: esquema"
+  commit id: "agente: seed"
+  commit id: "fix: review (FK compuesta)"
+  checkout main
+  merge feat/schema-seed
+  branch feat/authz
+  commit id: "agente: RLS + selector"
+  commit id: "fix: quitar service_role"
+  checkout main
+  merge feat/authz
+</pre>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Reglas del flujo</h3>
+      <ul class="clean">
+        <li>El agente crea la rama, los commits y el PR (<code>gh pr create</code>).</li>
+        <li>Tú revisas en GitHub <b>con comentarios en líneas concretas</b>: qué está mal, qué dejas pasar y por qué.</li>
+        <li>Las correcciones van en commits nuevos en la misma rama.</li>
+        <li>Merge con <b>"Create a merge commit"</b>. Desactiva squash y rebase en Settings → General.</li>
+      </ul>
+    </div>
+    <div class="card"><h3>Detalles prácticos</h3>
+      <ul class="clean">
+        <li>GitHub no te deja aprobar tu propio PR: usa <b>"Review changes → Comment"</b>.</li>
+        <li>Deja al menos un "lo dejo pasar porque…". Enseña criterio, no solo detección.</li>
+        <li>Anota la hora de inicio y fin de cada PR en un <code>TIMELOG.md</code>.</li>
+        <li>Commitea los prompts y los logs de sesión en <code>/ai-logs</code>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 REVIEW -->
+<section id="review">
+  <div class="sec-head">
+    <span class="eyebrow">Lo que buscan que detectes</span>
+    <h2>Checklist de revisión de cada PR</h2>
+    <p class="muted">El enunciado nombra tres cosas: la fuga entre tenants, la migración que no podrás correr en 3 meses y lo que no merece discusión.</p>
+  </div>
+  <div class="grid3">
+    <div class="card"><span class="tag no">fuga entre tenants</span>
+      <ul class="clean check">
+        <li><code>SUPABASE_SERVICE_ROLE_KEY</code> usada en rutas de usuario</li>
+        <li>Tabla nueva sin <code>enable row level security</code></li>
+        <li><code>brand_id</code> o <code>user_id</code> tomados del cliente</li>
+        <li>Filtrado hecho en el componente y no en la consulta</li>
+        <li>Agregados que incluyen a otros especialistas</li>
+        <li>Página cacheada y compartida entre usuarios</li>
+      </ul></div>
+    <div class="card"><span class="tag mid">migración del futuro</span>
+      <ul class="clean check">
+        <li>Enum de Postgres para categorías</li>
+        <li>Rol global en <code>profiles</code></li>
+        <li>Falta de <code>external_id</code> o sin <code>unique</code></li>
+        <li>Borrado duro de etiquetas usadas</li>
+        <li>Datos de seed dentro de las migraciones</li>
+        <li>FKs sin índice</li>
+      </ul></div>
+    <div class="card"><span class="tag">no merece discusión</span>
+      <ul class="clean check">
+        <li>Nombres de variables o clases</li>
+        <li>Pequeñas duplicaciones de Tailwind</li>
+        <li>Falta de tests (explícalo en una línea)</li>
+        <li>Edge cases de fechas fuera del seed</li>
+      </ul></div>
+  </div>
+</section>
+
+<!-- 9 SEED -->
+<section id="seed">
+  <div class="sec-head">
+    <span class="eyebrow">Mínimo: 2 marcas, 3 especialistas, 2 leads</span>
+    <h2>Datos de seed: pocos, creíbles y distintos</h2>
+  </div>
+  <div class="grid3">
+    <div class="card"><span class="tag acc">técnica</span><h3>Voltra</h3><p class="muted">Patinetes eléctricos. Regla: diagnosticar primero (bloqueo de batería, firmware, presión de ruedas) y después ofrecer la devolución. Tono cercano.</p></div>
+    <div class="card"><span class="tag ok">commodity</span><h3>Boxwell</h3><p class="muted">Cajas y packaging B2B. Regla: 3 líneas, número de pedido, fecha exacta. Tono seco y profesional.</p></div>
+    <div class="card"><span class="tag">aislamiento</span><h3>Hebra</h3><p class="muted">Tienda de lana. Pocas filas; existe para demostrar que Marta no ve lo de Nuria.</p></div>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Persona</th><th>Rol</th><th>Marcas</th><th>Papel en la demo</th></tr></thead>
+      <tbody>
+        <tr><td>Marta</td><td>lead</td><td>Voltra, Boxwell</td><td>Ve la cola y la tendencia de dos marcas</td></tr>
+        <tr><td>Nuria</td><td>lead</td><td>Hebra</td><td>Demuestra el aislamiento entre leads</td></tr>
+        <tr><td>Dani</td><td>especialista</td><td>Voltra, Boxwell</td><td>Tiene la respuesta claramente mala (devolución sin diagnóstico)</td></tr>
+        <tr><td>Leo</td><td>especialista</td><td>Voltra, Hebra</td><td>Buen diagnóstico: el ejemplo positivo</td></tr>
+        <tr><td>Sara</td><td>especialista</td><td>Boxwell, Hebra</td><td>Cerró tickets sin revisar el historial del pedido (la anécdota de las notas)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="clean">
+    <li>~45 respuestas repartidas en 6 semanas, ~30 reseñadas, para que las medias tengan sentido y se vea una mejora en Voltra tras un "cambio".</li>
+    <li>Unas 8 respuestas escritas a mano con cuidado, y el resto variaciones generadas por el agente y revisadas por ti.</li>
+    <li>Fechas relativas a <code>now()</code> para que "ayer" siempre tenga datos al correr el seed.</li>
+  </ul>
+</section>
+
+<!-- 10 DECISIONS -->
+<section id="decisions">
+  <div class="sec-head">
+    <span class="eyebrow">2 páginas como máximo</span>
+    <h2>Esqueleto de DECISIONS.md</h2>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Producto</h3>
+      <ul class="clean">
+        <li><b>Problema real</b>: no hay registro del juicio de calidad, así que no hay coaching, ni prueba, ni alerta temprana.</li>
+        <li><b>Construí</b> el bucle de revisión y lo cerré con la vista del especialista. La tendencia de marca, mínima.</li>
+        <li><b>Dónde encajaría un modelo</b>: en <i>elegir cuáles 5 leer</i>. Marcar respuestas con riesgo (ofrece devolución sin pasos de diagnóstico en Voltra, no menciona el pedido). Condición: cientos de reseñas humanas para medir si su triage coincide con el de Marta. Nunca pone notas.</li>
+        <li><b>Preguntas V2</b>: ¿la nota debe ser distinta por marca? ¿Quién mantiene las reglas de cada marca? ¿El cliente vería esto directamente?</li>
+      </ul></div>
+    <div class="card"><h3>Arquitectura</h3>
+      <ul class="clean">
+        <li>Server Components + server actions y una capa <code>lib/data/*</code> con acceso tipado.</li>
+        <li>Modelo: rol por marca, FK compuesta, <code>source/external_id</code>.</li>
+        <li>Authz: RLS y además <code>requireMembership</code> para devolver 403. Qué faltaría para auth real.</li>
+        <li>Qué se rompe primero al crecer.</li>
+      </ul></div>
+    <div class="card"><h3>IA</h3>
+      <ul class="clean">
+        <li>Cómo trabajaste: agente → PR → review.</li>
+        <li>2 o 3 casos concretos en los que corregiste al agente (enlaza los comentarios del PR).</li>
+        <li>Un prompt del que estés orgulloso, pegado tal cual.</li>
+      </ul></div>
+    <div class="card"><h3>Estado</h3>
+      <ul class="clean">
+        <li>Terminado / a medias / sin tocar, en orden de prioridad.</li>
+        <li>Qué testearías primero: las políticas RLS con pgTAP o <code>supabase test db</code>, porque es donde un error cuesta una cuenta.</li>
+        <li>Lo que más criticarías si fuera el PR de otro, y por qué lo dejaste.</li>
+      </ul></div>
+  </div>
+  <p class="quote">Para cada recorte, una frase de porqué. En la entrevista preguntan por dos cosas que recortaste.</p>
+</section>
+
+</div>
+<script>
+// Fuera del visor de artifacts (p. ej. al abrir el HTML descargado) nadie renderiza Mermaid:
+// si tras un momento los bloques siguen como texto, cargamos la librería y los dibujamos.
+(function () {
+  function pending() {
+    return Array.prototype.filter.call(document.querySelectorAll('pre.mermaid'), function (el) {
+      return !el.querySelector('svg') && !el.hasAttribute('data-processed');
+    });
+  }
+  function render() {
+    var nodes = pending();
+    if (!nodes.length) return;
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js';
+    s.onload = function () {
+      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+      window.mermaid.run({ nodes: pending() });
+    };
+    document.head.appendChild(s);
+  }
+  if (document.readyState === 'complete') setTimeout(render, 800);
+  else window.addEventListener('load', function () { setTimeout(render, 800); });
+})();
+</script>

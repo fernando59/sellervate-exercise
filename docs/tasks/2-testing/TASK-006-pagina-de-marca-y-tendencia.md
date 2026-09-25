@@ -111,6 +111,11 @@ Recharts 3 (`LineChart`, `ReferenceLine`, `connectNulls`, `ResponsiveContainer` 
 
 ## Notas de implementación
 
+### 2026-09-25 · Prueba en el Chrome del usuario, con el PR abierto
+- Bug encontrado y arreglado (`032d928`): el punto hueco de la semana en curso (5,0) salía cortado por arriba. Lo causaba `allowDataOverflow` en el eje Y, porque Recharts recorta los puntos al área del gráfico; el `padding` no alcanzaba. Se quitó: las medias siempre están entre 1 y 5, así que el dominio sigue fijo.
+- Verificado como Marta: la navegación en la cabecera, los links "Overview" del home, el gráfico con los puntos enteros y el tooltip "Week of 31 Aug · 3.3 · 3 reviews · 0 critical". Como Dani: "No brand overview here", y en la cabecera solo "My feedback".
+- Queda para TASK-007: en el 404, la pestaña dice "Brand overview · Sellervate QA". Lo mismo pasa hoy en `/review` y `/replies/[id]`.
+
 ### 2026-09-25 · Revisión de los subagentes
 - `tenant-isolation-reviewer`: sin fugas. Probó `brand_weekly_scores`, `specialist_brand_scores`, `brand_events`, `profiles` y `brands` con el JWT de las cinco personas. Dani 13 + Leo 10 = los 23 de Voltra que ve Marta; Nuria no ve nada de Voltra ni de Boxwell; `anon` recibe `permission denied`.
   - Arreglado (R2): la regla "lead de esta marca" estaba repetida a mano en la página. Ahora es `findLedBrand` en `server/auth/session.ts`.

@@ -1103,3 +1103,49 @@ Primero exporto el log mientras sigo en `feat/authz`, así toma el nombre de est
 
 > 🔧 `Bash` — Export this session's log with the hook
 
+
+### 🤖 Asistente
+
+Verifico que la redacción funcionó (sin email ni claves) antes de commitear nada.
+
+> 🔧 `Bash` — Check the exported log is redacted
+
+> 🔧 `Bash` — Inspect the sb_secret matches
+
+
+### 🤖 Asistente
+
+Esas 6 coincidencias son solo el texto `sb_secret_…` que cita CLAUDE.md, no claves reales. El log está limpio. Ahora creo la rama del siguiente feature desde un `main` actualizado.
+
+> 🔧 `Bash` — Update main, branch off, check TASK-004 template
+
+> 🔧 `Bash` — Move tasks on the board and update status
+
+> 🔧 `Bash` — Commit board move and session log
+
+> 🔧 `Bash` — Check TASK-004 for open decisions
+
+> 🔧 `Write`
+
+> 🔧 `Bash` — Update memory index
+
+
+### 🤖 Asistente
+
+La rama del siguiente feature ya está lista y el log de esta sesión quedó commiteado en ella.
+
+- **Rama:** creé `feat/review-queue` a partir de `main` actualizado, que ya incluye el merge del PR #4.
+- **Tablero (`b01498f`):**
+  - TASK-003 pasó a `3-done`.
+  - TASK-004 (la cola de revisión) pasó a `1-doing` con su rama. Antes comprobé que no le quedara ningún `COMPLETAR` y que tuviera todas las secciones de la plantilla.
+  - En CLAUDE.md, el PR3 figura como mergeado con review y el PR4 como en curso.
+- **Log (`39bcb0d`):** `ai-logs/05-feat-authz.md` + `.jsonl`. Revisé que no tenga tu email, ninguna clave `sb_secret_` real ni ningún JWT de `service_role`.
+
+La rama es solo local, todavía no la subí.
+
+Para limpiar la conversación, escribe **`/clear`**. El hook va a volver a exportar esta sesión sobre `05-feat-authz` con los últimos mensajes. En la próxima sesión, esos cambios de `ai-logs/` aparecen en `git status` y los commiteo en esta misma rama.
+
+Para empezar TASK-004 en la sesión nueva, el contexto se carga solo desde CLAUDE.md, el plan y la tarea, así que alcanza con escribir "sigamos con TASK-004". La tarea ya tiene decisiones tomadas en el grill de TASK-003, como la regla de que una etiqueta crítica limita la nota a 2 y la función `save_review`. Aun así, si quieres repasar alguna duda antes de escribir código, se puede correr `/grill-me` primero.
+
+Te falta anotar los minutos reales del PR #4 en `docs/TIMELOG.md`. Se pasó de los 50 minutos presupuestados, y conviene registrarlo antes de que se te olvide.
+

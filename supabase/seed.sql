@@ -2,8 +2,8 @@
 --
 -- Three brands that read very differently (an e-scooter brand that must diagnose
 -- before offering a return, a B2B packaging supplier that wants three exact lines,
--- and a yarn shop), two leads and three specialists, 45 replies over six weeks and
--- 32 reviews. Dates are relative to now() so "yesterday" always has work in the
+-- and a yarn shop), two leads and three specialists, 55 replies over six weeks and
+-- 46 reviews. Dates are relative to now() so "yesterday" always has work in the
 -- review queue.
 --
 -- Everyone signs in with the password `password123`.
@@ -129,6 +129,14 @@ Leo'),
 That does not sound right for a five-month-old battery. I have ordered a replacement battery for you, it should arrive within a week.
 
 Dani'),
+('VOL-48175', 'voltra', 'dani', 35, '10:40', 120,
+ 'Charger light stays red',
+ 'The charger light has been red all night and the scooter still shows one bar. Can you send me a new charger?',
+ 'Hi Marco,
+
+No problem, I have sent you a new charger, it should arrive in 2-3 days. Sorry for the trouble!
+
+Dani'),
 ('VOL-48201', 'voltra', 'leo', 33, '10:22', 55,
  'App will not connect to the scooter',
  'The Voltra app keeps saying "scooter not found". Bluetooth is on. I have an S2.',
@@ -155,6 +163,14 @@ Leo'),
 Squeaky brakes are totally normal in the first 100 km, they settle down on their own. If it does not stop after that, just send it back to us.
 
 Dani'),
+('VOL-48252', 'voltra', 'leo', 30, '11:55', 45,
+ 'Display shows E10',
+ 'My display shows E10 and the scooter will not accelerate. What does it mean?',
+ 'Hi Sofia,
+
+E10 means the throttle is not sending a signal. Please switch the scooter off, unplug the throttle cable under the handlebar cover, check the pins are dry and straight, and plug it back in until it clicks.
+
+Leo'),
 ('VOL-48270', 'voltra', 'leo', 29, '09:30', 35,
  'Charger light stays red',
  'I plugged the charger in six hours ago and the light is still red. Is the charger broken?',
@@ -174,6 +190,14 @@ Leo'),
 It sounds like a motor fault. I have arranged a replacement motor for you under warranty, a technician will contact you to book a visit.
 
 Dani'),
+('VOL-48310', 'voltra', 'dani', 26, '14:25', 160,
+ 'Brakes feel weak',
+ 'The front brake on my S2 barely stops me anymore. I have had it for two months.',
+ 'Hi Anna,
+
+Brake pads on the S2 are covered by the warranty for the first year, so I have ordered a new front brake assembly for you. It ships tomorrow.
+
+Dani'),
 ('VOL-48331', 'voltra', 'leo', 24, '12:02', 60,
  'Folding latch is stiff',
  'The folding latch is really hard to close, I have to push it with my foot.',
@@ -182,6 +206,15 @@ Dani'),
 That usually means the latch pin is dry. A drop of silicone lubricant on the pin (not WD-40, it attracts dirt), then open and close it five or six times, should make it smooth again.
 
 Leo'),
+('VOL-48350', 'voltra', 'dani', 22, '09:35', 85,
+ 'Scooter turns off on hills',
+ 'Every time I go up the hill to my office the scooter just switches off. Then it turns on again after a minute.',
+ 'Hello,
+
+We are sorry for the inconvenience. This can happen when the battery is low. Please make sure it is fully charged before riding uphill. If the problem continues, please contact us again.
+
+Kind regards,
+Dani'),
 ('VOL-48372', 'voltra', 'dani', 20, '08:55', 70,
  'Will not turn on after winter storage',
  'I stored the scooter in the garage over winter and now it does nothing when I press the button. Do I need to send it in?',
@@ -204,6 +237,18 @@ E3 is the throttle sensor, and nine times out of ten it is a loose cable after a
 If E3 comes back, send me a photo of that connector and we will take it from there.
 
 Leo'),
+('VOL-48420', 'voltra', 'dani', 16, '12:45', 60,
+ 'Charger light stays red',
+ 'Charged the scooter overnight, the charger light is still red this morning. Is the charger broken?',
+ 'Hi Elena,
+
+Probably not! Two quick checks first:
+1. Unplug the charger from the wall for 30 seconds, then plug the wall side in before the scooter side.
+2. Look inside the charging port: a bent or dirty pin keeps the light red. A dry cotton bud cleans it.
+
+If it is still red after that, send me a photo of the label on the charger and I will send a new one the same day.
+
+Dani'),
 ('VOL-48441', 'voltra', 'dani', 15, '10:10', 90,
  'Tyre keeps going flat',
  'The front tyre has gone flat three times in two weeks. I pump it up and a few days later it is soft again.',
@@ -219,6 +264,16 @@ Dani'),
  'Hi Ben,
 
 The S2 is rated IPX5: fine in light rain and wet roads, but avoid puddles deeper than the wheel hub and never leave it outside overnight in the rain. Braking distance is longer on wet roads, so go easy on the brakes.
+
+Leo'),
+('VOL-48485', 'voltra', 'leo', 11, '08:50', 30,
+ 'Folding latch is loose',
+ 'The stem wobbles a little when I ride, I think the folding latch is loose. Is it safe?',
+ 'Hi Kai,
+
+Please do not ride it until this is fixed. The latch has an adjustment screw under the rubber cap on the hinge: turn it clockwise with the 4 mm key from the box, a half turn at a time, until the latch closes firmly with no play.
+
+If it still wobbles, send me a short video and I will book a free pickup.
 
 Leo'),
 ('VOL-48502', 'voltra', 'dani', 10, '09:48', 65,
@@ -298,6 +353,14 @@ Your order ships this week, so you should be all good for your launch :)
 
 Thanks,
 Sara'),
+('BW-20940', 'boxwell', 'dani', 39, '11:30', 40,
+ 'Invoice address',
+ 'Please change the invoice address on order BW-20940 to our new warehouse, Calle Industria 14, Getafe.',
+ 'Hi,
+
+Done: the invoice for order BW-20940 now goes to Calle Industria 14, Getafe. The address on your account is updated too, so future orders will use it. Let me know if the delivery address should change as well.
+
+Dani'),
 ('BW-20955', 'boxwell', 'dani', 37, '10:45', 30,
  'Invoice copy',
  'Please send a copy of the invoice for order BW-20955, our accounts team cannot find it.',
@@ -335,6 +398,14 @@ If there is anything else at all we can help with, please do not hesitate to rea
 
 Have a wonderful day!
 Dani'),
+('BW-21080', 'boxwell', 'sara', 27, '10:20', 50,
+ 'Where is my order?',
+ 'Order BW-21080 was due yesterday and nothing arrived. Please advise.',
+ 'Hi,
+
+Sorry for the delay. Orders usually ship within 5 business days, so it should be with you soon.
+
+Sara'),
 ('BW-21102', 'boxwell', 'sara', 25, '09:10', 1500,
  'Bulk pricing for 5,000 units',
  'We are planning an order of 5,000 double-wall shipping boxes (40x30x30). What is your unit price at that volume?',
@@ -363,6 +434,15 @@ Regards, Dani'),
 Thanks for letting us know. I have asked the warehouse to check.
 
 Sara'),
+('BW-21570', 'boxwell', 'dani', 14, '13:10', 30,
+ 'Reorder same boxes',
+ 'We need the same shipping boxes as last time, 500 units. Can you set it up?',
+ 'Hi,
+
+Order BW-21570 is set up: 500 units of the 40x30x20 single-wall box, same size and print as your last order.
+Ships Thursday, delivered Friday before 14:00.
+
+Dani'),
 ('BW-21590', 'boxwell', 'sara', 12, '09:40', 35,
  'Pallet arrived damaged',
  'One pallet of order BW-21590 arrived crushed on one side, about 60 boxes are unusable. Photos attached.',
@@ -375,6 +455,15 @@ Regards, Sara'),
  'Order BW-21622: corrected invoice INV-89020-A attached, with VAT number GB 294 8812 03.
 The original is cancelled.
 Regards, Dani'),
+('BW-21640', 'boxwell', 'sara', 7, '10:05', 40,
+ 'Change delivery date',
+ 'Can order BW-21640 arrive on Monday instead of Wednesday? Our warehouse is closed midweek.',
+ 'Hi,
+
+Order BW-21640 is ready in our warehouse, so Monday works: delivery Monday between 08:00 and 12:00, same carrier.
+The Wednesday slot is cancelled.
+
+Sara'),
 ('BW-21655', 'boxwell', 'sara', 5, '14:20', 45,
  'Reorder same as last time',
  'We would like to reorder exactly what we got last time. Can you set that up?',
@@ -519,23 +608,39 @@ insert into seed_reviews values
  'No diagnosis at all. At Voltra, "will not turn on" after a full charge is almost always the battery lock: ask her to hold the power button for 10 seconds. We are now paying shipping both ways for a scooter that most likely works.'),
 ('VOL-48133', 5, '{}', true,
  'Exactly the Voltra flow: two checks the customer can do in five minutes, a clear next step if they fail, and a safety note. Good example for onboarding.'),
+('VOL-48175', 2, '{skipped_procedure}', false,
+ 'A red charger light after a night is usually a dirty charging port or the wall-first plug order. Two checks first, a new charger only if they fail.'),
+('VOL-48160', 2, '{skipped_procedure}', false,
+ 'Range loss at five months is almost always tyre pressure or Eco mode. Ask for both before sending a 300 euro battery.'),
 ('VOL-48201', 3, '{length}', false,
  'Right diagnosis (firmware first). Eight steps is a lot to read on a phone: link the update guide and keep the three steps that matter.'),
 ('VOL-48236', 2, '{wrong_info}', false,
  'Squeaking is not "normal": the Voltra fix is re-aligning the caliper. Telling a customer something wrong about their own scooter is the mistake that loses the account, worse than any tone issue.'),
+('VOL-48252', 3, '{incomplete}', false,
+ 'Right first check, but no next step if the cable is fine. Tell her we replace the throttle under warranty so she does not have to write again.'),
 ('VOL-48270', 4, '{}', false,
  'Explains what the light means, gives a check and a clear threshold for the warranty. Could have asked for the charger label in the first reply and saved a round trip.'),
 ('VOL-48299', 1, '{wrong_info,skipped_procedure}', false,
  '15 km/h is Eco mode, not a motor fault: double-tap the power button for Sport. We booked a technician visit for a setting. Please run the checklist before any replacement, every time.'),
+('VOL-48310', 2, '{wrong_info}', false,
+ 'Brake pads are a wear part and not covered by the warranty. The S2 fix is tightening the cable at the lever, one turn of the barrel adjuster. We just promised a free part we do not give.'),
 ('VOL-48331', 3, '{incomplete}', false,
  'Right fix, but nothing about what to do if the lubricant does not help. She will write back.'),
+('VOL-48350', 3, '{tone}', false,
+ 'Low battery is the right first guess on a hill. But "Hello" and "kind regards" is not how Voltra talks, and ask for the battery level shown on the display so we know.'),
 -- After the checklist became mandatory.
 ('VOL-48372', 4, '{}', false,
  'Much better: battery lock first, then a full charge, and only then the return. This is the checklist working.'),
 ('VOL-48405', 5, '{}', false,
  'Knows the error code, gives a fix the customer can do, and asks for a photo if it fails.'),
+('VOL-48420', 4, '{}', false,
+ 'Same problem as VOL-48175 a few weeks ago, and this time the checks come first. Could have said how long the full charge should take.'),
 ('VOL-48441', 3, '{tone}', false,
  'Right steps, but "Dear customer" and "please be advised" is not Voltra. We write like a friend who knows scooters: first name, plain words.'),
+('VOL-48468', 5, '{}', false,
+ 'Exact rating, what it means in practice, and a safety note on braking.'),
+('VOL-48485', 5, '{}', false,
+ 'Stops the ride first, then a fix with the right tool, then a free fallback.'),
 ('VOL-48502', 4, '{}', false,
  'Clear options and asks for the photo first. Could have told her the pickup is free of charge up front.'),
 ('VOL-48536', 5, '{}', false,
@@ -549,22 +654,34 @@ insert into seed_reviews values
 -- Boxwell (Marta).
 ('BW-20931', 2, '{no_order_check,incomplete}', false,
  'No date, and "this week" is wrong: the order was on hold waiting for artwork approval. A ten-second look at the order history would have shown it. The customer has a launch on the 14th.'),
+('BW-20940', 4, '{length}', false,
+ 'Correct and done. The last line is one too many: Boxwell buyers ask if they need something else.'),
 ('BW-20955', 5, '{}', true,
  'This is the Boxwell reply: order number, the answer, the date. Three lines.'),
+('BW-20988', 2, '{no_order_check,incomplete}', false,
+ 'The order history shows this batch came from the new supplier. Say so, send replacement lids and give a date. "We will look into it" means they write again.'),
 ('BW-21040', 1, '{no_order_check,wrong_info}', false,
  'The order history shows they ordered 30x20x15 and approved the proof. We shipped 400 boxes for free for a mistake that was not ours. Always open the order before answering.'),
 ('BW-21066', 3, '{length,tone}', false,
  'Correct, but eight lines and emojis. Boxwell buyers want three: order number, what changed, the date.'),
+('BW-21080', 2, '{no_order_check}', false,
+ 'The order shipped in two parts and the first one was delivered yesterday to reception. The tracking was one click away.'),
 ('BW-21102', 3, '{slow}', false,
  'Perfect reply, 25 hours late. Quotes are answered the same business day at Boxwell, or the buyer asks someone else.'),
 ('BW-21477', 2, '{no_order_check,incomplete}', false,
  'The order was split into two shipments and the second one is in the warehouse. Third ticket this month closed without opening the order history. Let us talk today.'),
 ('BW-21510', 5, '{}', false,
  'Exact lead time and an exact date tied to their approval. Nothing to add.'),
+('BW-21548', 3, '{incomplete}', false,
+ 'Right to check the warehouse, but give them a time for the answer. A missing pallet stops their packing line.'),
+('BW-21570', 4, '{}', false,
+ 'Looked up the last order and gave the ship and delivery days. Name the Thursday date so nobody has to check a calendar.'),
 ('BW-21590', 4, '{}', false,
  'Order checked, credit note, exact date. This is the standard. Could say which carrier tracking to expect.'),
 ('BW-21622', 5, '{}', false,
  'Fast and exact.'),
+('BW-21640', 4, '{}', false,
+ 'Checked the order status before promising Monday. Three lines, exact slot.'),
 ('BW-21655', 4, '{}', false,
  'Good: looked up the previous order instead of asking the customer what they bought.'),
 ('BW-21690', 5, '{}', false,

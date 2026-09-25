@@ -13,6 +13,10 @@ export type Membership = {
   role: BrandRole;
 };
 
+/** A membership checked to be lead; the server/data functions for leads take it. */
+export type LeadMembership = Membership & { role: "lead"; readonly [leadChecked]: true };
+declare const leadChecked: unique symbol;
+
 export type CurrentUser = {
   id: string;
   fullName: string;
@@ -72,6 +76,18 @@ export function requireMember(user: CurrentUser, brandSlug: string): Membership 
   const membership = user.memberships.find((m) => m.slug === brandSlug);
   if (!membership) throw new ForbiddenError();
   return membership;
+}
+
+/**
+ * The caller's lead membership in the brand with this slug, or null. For pages
+ * that answer not found instead of 403: a brand the caller does not lead and a
+ * brand that does not exist look the same (TASK-006, Q1).
+ */
+export function findLedBrand(user: CurrentUser, brandSlug: string): LeadMembership | null {
+  const membership = user.memberships.find((m) => m.slug === brandSlug && m.role === "lead");
+  // The one place a LeadMembership is made: the brand is a type-only mark, so a
+  // hand-built { role: "lead" } object does not compile where one is required.
+  return membership ? (membership as LeadMembership) : null;
 }
 
 /**

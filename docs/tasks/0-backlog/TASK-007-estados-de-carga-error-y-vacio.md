@@ -75,6 +75,10 @@ No mostrar `error.message` crudo.
 
 ## Notas de implementación
 
+### 2026-09-25 · Aviso desde TASK-006
+- En los `not-found.tsx` por segmento (`/brands/[slug]`, `/review`, `/replies/[id]`), la pestaña conserva el título de la página ("Brand overview · Sellervate QA"): la `metadata` de un `not-found` solo se aplica en `global-not-found` (doc local de Next 16, `not-found.md` § Metadata). Opciones: un `<title>` de React 19 en el componente o `generateMetadata` en la página. Hay que verificar que el título no quede duplicado.
+- `/brands/[slug]` ya tiene su `not-found.tsx` y el estado vacío de una marca sin reseñas.
+
 ### 2026-09-25 · Adelantado en TASK-004
 - `/review` y `/replies/[id]` ya tienen su `not-found.tsx` diseñado, con salida a la cola o al inicio (`ui/link-button.tsx`). Faltan el `not-found` global, los `loading.tsx` y los `error.tsx`.
 

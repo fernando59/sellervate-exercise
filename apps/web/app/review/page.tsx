@@ -95,7 +95,7 @@ export default async function ReviewPage({ searchParams }: PageProps<"/review">)
                 Open full reply and brand guidelines
               </Link>
             </div>
-            <ReplyMessages reply={selected} />
+            <ReplyMessages reply={selected} withBrandLink />
             <ReviewForm
               key={selected.id}
               replyId={selected.id}

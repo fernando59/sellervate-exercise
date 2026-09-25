@@ -1,7 +1,7 @@
 ---
 id: TASK-005
 titulo: Mi feedback, la vista del especialista
-estado: testing
+estado: done
 prioridad: alta
 estimacion: 90
 creada: 2026-09-23
@@ -85,6 +85,9 @@ Server Components que leen de `server/data`. Colores semánticos solo para resul
 - No calcular las tarjetas sobre la página visible: con paginación, la media sería la de 20 filas.
 
 ## Notas de implementación
+
+### 2026-09-25 · "Former brand" verificado en el navegador
+- El usuario borró a mano la membresía de Dani en Boxwell en la base local; al agente le bloquearon el `delete`. Como Dani, `/me` mostró Voltra y después la tarjeta "Former brand" con "Your average" (4.5, 4 reviews), las filas de Boxwell marcadas "Former brand" y el selector de marca oculto (le queda una sola). El enlace de etiqueta de esa tarjeta (`/me?issue=length`) filtró a BW-21066. Sin scroll horizontal a 320 y 1280 px. Base restaurada con `pnpm db:reset`.
 
 ### 2026-09-25 · Revisión de los subagentes (ronda 3)
 - `tenant-isolation-reviewer`: sin fugas. Probó las tres vistas con el JWT de las cinco personas, por SQL y por REST: cada especialista solo ve lo suyo, los leads el desglose de sus marcas (lo que necesita TASK-006), `anon` y cualquier escritura por la vista dan `permission denied`, y ninguna búsqueda armada con `cleanSearch` sale de su filtro. Arreglado: comentario en `reviewed_replies` que dice que es de solo lectura por grant (es auto-updatable). Para DECISIONS.md: `create index` sin `concurrently` bloquearía escrituras a volumen del importador; las vistas atan el tipo de las columnas que usan; el `array(...)` por fila de `reviewed_replies` se paga en la vista del lead.

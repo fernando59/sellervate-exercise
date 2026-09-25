@@ -37,6 +37,8 @@ Antes de abrir un PR:
   - `security-reviewer` (Sonnet): si toca auth, sesión, cookies, variables de entorno o dependencias nuevas.
   - Sus hallazgos son insumo para el usuario, no reemplazan su review en GitHub.
 
+**Nada arreglable queda para la review.** Antes de `gh pr create`, todo lo que se encontró (el agente o los subagentes) y tiene un arreglo razonable se arregla: bugs, casos borde, tipos forzados, cosas "sin verificar" que se pueden verificar. Nunca se deja un problema a propósito para que el usuario tenga algo que comentar: él lee el PR y busca por su cuenta. Lo único que no se arregla es lo que **tiene que decidir el usuario**, y eso se le pregunta antes de abrir el PR, no se deja como comentario.
+
 Después de abrir un PR, darle al usuario (en español) **una lista de puntos concretos para comentar en su review**, incluidas las debilidades honestas del PR, y marcar qué dejaría pasar y por qué. Cada punto va con `archivo:línea` y el comentario ya redactado **en inglés**, con la convención de abajo, listo para pegar.
 
 Convención de review (la escribe el usuario en GitHub):

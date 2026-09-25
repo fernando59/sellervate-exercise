@@ -85,6 +85,16 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ## Notas de implementación
 
+### 2026-09-25 · Correcciones después de abrir el PR (pedido del usuario)
+El usuario pidió no dejar nada arreglable como punto de review. Esto quedó como regla en CLAUDE.md. Se corrigió:
+- La regla de visibilidad estaba duplicada en `save_review`. Ahora vive en `private.can_see_reply()`, que usan tanto `replies_select` (`alter policy`) como la función. La matriz de RLS da los mismos números antes y después.
+- "No encontrada" pasó de `P0002` a `PT404`. Por HTTP, PostgREST devolvía 500 con `P0002`; ahora devuelve 404.
+- Se verificó `save_review` por HTTP real contra PostgREST: escritura directa 403, crítica con 5 da 400, Nuria sobre Voltra 404, anon 401, y un guardado válido 200.
+- El seed fecha en días y horas de Madrid, así la cola nunca queda vacía entre las 22:00 y las 24:00 UTC.
+- `J`/`K` funcionan aunque la respuesta abierta quede oculta por el filtro "Unreviewed".
+- `score` es `number | undefined` en la entrada del schema (`optional().pipe(...)`); ya no hace falta forzar el tipo para limpiarla.
+- `/replies/[id]`: el lead ve solo su propia reseña, igual que en la cola (Q6); el autor ve todas.
+
 ### 2026-09-25 · Cambio de Q18 (pedido del usuario al probar la UI)
 - Con una etiqueta crítica marcada, los botones 3–5 se deshabilitan y los atajos `3`–`5` se ignoran. Así la regla se ve mientras se elige, y no recién al guardar. No sugiere ninguna nota: la elección entre 1 y 2 sigue siendo del lead. El argumento original de Q18 ("la UI propondría la nota") era flojo.
 - Si la nota ya era mayor que 2 cuando se marca la crítica, se **limpia** (decisión del usuario). La primera versión la dejaba seleccionada y marcada en rojo, pero se sentía como un error de validación. Tampoco se baja sola a 2: el formulario no elige la nota por el lead. Al guardar sin nota aparece "Pick a score from 1 to 5.".

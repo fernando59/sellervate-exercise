@@ -1,13 +1,13 @@
 ---
 id: TASK-006
 titulo: Página de marca con tendencia semanal y problemas frecuentes
-estado: doing
+estado: testing
 prioridad: media
 estimacion: 60
 creada: 2026-09-23
 actualizada: 2026-09-25
 rama: feat/brand-overview
-pr:
+pr: https://github.com/fernando59/sellervate-exercise/pull/7
 tags: [ui, chart, db, seed]
 depende_de: [TASK-004, TASK-005]
 bloqueada_por:

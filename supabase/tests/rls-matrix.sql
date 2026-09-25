@@ -229,4 +229,82 @@ begin
   raise notice 'ok: new functions are not executable by anon';
 end $$;
 
+-- save_review (TASK-004) ---------------------------------------------------------
+
+-- Nuria saves a review on a leaked Voltra reply id: she cannot see the reply.
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+begin
+  perform public.save_review(current_setting('sellervate.voltra_reply')::uuid, 1, '', '{}');
+  raise exception 'FAIL: Nuria saved a review on a Voltra reply';
+exception when no_data_found then
+  raise notice 'ok: save_review hides another brand''s reply (P0002)';
+end $$;
+reset role;
+
+-- Dani sees their own reply but is not a lead: explicit 42501.
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000003","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+declare
+  own_reply uuid;
+begin
+  select id into own_reply from public.replies where specialist_id = 'a0000000-0000-4000-8000-000000000003' limit 1;
+  perform public.save_review(own_reply, 5, '', '{}');
+  raise exception 'FAIL: a specialist reviewed their own reply';
+exception when insufficient_privilege then
+  raise notice 'ok: save_review rejects a specialist (42501)';
+end $$;
+reset role;
+
+-- Marta: invalid input is rejected; saving twice edits one review.
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+declare
+  reply uuid := current_setting('sellervate.voltra_reply')::uuid;
+  first_id uuid;
+  second_id uuid;
+  issues text[];
+begin
+  begin
+    perform public.save_review(reply, 4, '', '{wrong_info}');
+    raise exception 'FAIL: a critical issue with score 4 was saved';
+  exception when invalid_parameter_value then
+    raise notice 'ok: a critical issue caps the score at 2 (22023)';
+  end;
+  begin
+    perform public.save_review(reply, 6, '', '{}');
+    raise exception 'FAIL: score 6 was saved';
+  exception when invalid_parameter_value then
+    raise notice 'ok: score outside 1-5 is rejected (22023)';
+  end;
+  begin
+    perform public.save_review(reply, 3, '', '{made_up}');
+    raise exception 'FAIL: an unknown issue code was saved';
+  exception when invalid_parameter_value then
+    raise notice 'ok: unknown issue codes are rejected (22023)';
+  end;
+  begin
+    -- slow was retired earlier in this transaction.
+    perform public.save_review(reply, 3, '', '{slow}');
+    raise exception 'FAIL: a retired issue code was saved';
+  exception when invalid_parameter_value then
+    raise notice 'ok: retired issue codes are rejected (22023)';
+  end;
+
+  first_id := public.save_review(reply, 2, '  Diagnose first.  ', '{skipped_procedure,tone}');
+  second_id := public.save_review(reply, 1, 'Diagnose first.', '{skipped_procedure,length}');
+  select array_agg(issue_code order by issue_code) into issues from public.review_issues where review_id = second_id;
+  if first_id <> second_id
+     or (select count(*) from public.reviews where reply_id = reply and reviewer_id = auth.uid()) <> 1
+     or issues <> '{length,skipped_procedure}'
+     or (select score from public.reviews where id = second_id) <> 1 then
+    raise exception 'FAIL: saving again did not edit the same review (issues %)', issues;
+  end if;
+  raise notice 'ok: saving again edits the review and replaces its issues';
+end $$;
+reset role;
+
 rollback;

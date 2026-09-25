@@ -38,13 +38,13 @@ Descartado en el grill: abrir la página al especialista con sus datos (su tende
 - [ ] Tabla por especialista, "All time": media, reseñas, críticas; ordenada por críticas desc y media asc (recortable)
 - [ ] Como Nuria y como Dani, `/brands/voltra` responde 404; `/brands/no-existe` también
 - [ ] Una marca sin reseñas muestra un `EmptyState` con link a `/review`
-- [ ] El home muestra una tarjeta por marca que lidera, y la franja de marca en `/review` enlaza a su página
+- [ ] El home enlaza a la página de cada marca que lidera, la franja de marca en `/review` también, y la cabecera tiene navegación según el rol
 - [ ] Sin scroll horizontal a 320, 375, 768 y 1280 px; la tabla por especialista se apila en el móvil
 - [ ] El gráfico tiene una tabla `sr-only` equivalente y el SVG va con `aria-hidden`
 
 ## Fuera de alcance
 
-Exportar, PDF, comparar marcas, vista materializada, "últimas reseñas" (Q9), marca "Former" para especialistas que dejaron la marca (Q10), zona horaria por marca (Q4), navegación en la cabecera (Q8), el pulido de estados de carga y error (TASK-007).
+Exportar, PDF, comparar marcas, vista materializada, "últimas reseñas" (Q9), marca "Former" para especialistas que dejaron la marca (Q10), zona horaria por marca (Q4), el pulido de estados de carga y error (TASK-007).
 
 ## Aislamiento entre marcas
 
@@ -111,15 +111,35 @@ Recharts 3 (`LineChart`, `ReferenceLine`, `connectNulls`, `ResponsiveContainer` 
 
 ## Notas de implementación
 
+### 2026-09-25 · Revisión de los subagentes
+- `tenant-isolation-reviewer`: sin fugas. Probó `brand_weekly_scores`, `specialist_brand_scores`, `brand_events`, `profiles` y `brands` con el JWT de las cinco personas. Dani 13 + Leo 10 = los 23 de Voltra que ve Marta; Nuria no ve nada de Voltra ni de Boxwell; `anon` recibe `permission denied`.
+  - Arreglado (R2): la regla "lead de esta marca" estaba repetida a mano en la página. Ahora es `findLedBrand` en `server/auth/session.ts`.
+  - Se deja (R1): las funciones de `brand-overview.ts` confían en que las llame un lead. No filtran datos (RLS limita a un especialista a lo suyo), pero los títulos mentirían si otra página las reutilizara.
+  - Para DECISIONS.md: `Europe/Madrid` está escrito en SQL y en TS; el filtro por `week` se aplica después de agrupar todo el historial de la marca, y es lo primero que se rompe con volumen.
+- `security-reviewer`: sin vulnerabilidades. Ninguna dependencia nueva tiene scripts de instalación, y las versiones son exactas. No tenía red para `pnpm audit`; lo corrió el agente: `pnpm audit --prod` → "No known vulnerabilities found".
+- `code-reviewer`: sin bloqueantes. Confirmó que la semana de la vista y la de `recentWeekStarts` coinciden.
+  - Su hallazgo 1 (la navegación contradice "Fuera de alcance") ya estaba corregido en el archivo de la tarea; leyó la versión anterior.
+  - Arreglado (2): con una marca sin reseñas, un `brand_event` quedaba invisible, porque el `EmptyState` reemplazaba toda la sección. Ahora "What changed" se muestra debajo del estado vacío. Se verificó en el navegador con una marca temporal (Marta como lead y un evento de hoy) y después se restauró la base con `pnpm db:reset`.
+  - Se deja (3): "Former specialist" cuando RLS oculta el perfil, igual que en `server/data/replies.ts`.
+
+### 2026-09-25 · Implementación
+- **Q4 corregida: semanas en Europe/Madrid, no en UTC.** Al implementar apareció `APP_TIME_ZONE` en `server/time.ts`, la zona en que la app ya mide "ayer". Con semanas en UTC, una respuesta del lunes 00:30 en Madrid caería en la semana anterior. La vista trunca `sent_at at time zone 'Europe/Madrid'` (pasando por un timestamp local: truncar el `timestamptz` y castear a `date` leería la medianoche de Madrid en UTC y daría domingo), y `recentWeekStarts` calcula los mismos lunes en JS.
+- **Q8 cambiada por el usuario a (b):** navegación en la cabecera, porque TASK-005 (Q7) ya la había prometido para esta tarea. Enlaces según el rol, armados en el servidor: "Review queue" y una entrada por marca que lidera (lead), "My feedback" (especialista). En móvil, una segunda fila; desde `md:`, en línea.
+- Home: la lista de marcas existente tiene un enlace "Overview" en las que lidera, en lugar de tarjetas nuevas. La franja de marca de `/review` enlaza a la página; la de `/replies/[id]` no, porque la ve el especialista.
+- Todo el acceso a datos está en `server/data/brand-overview.ts`, en vez de `trends.ts`: son cuatro lecturas de la misma página.
+- Seed: 10 respuestas nuevas y 14 reseñas nuevas (4 de ellas sobre respuestas viejas sin reseñar), 55 respuestas y 46 reseñas en total. Voltra: ~2,6 antes del checklist y ~4,4 después. Boxwell: casi todas las semanas con n = 3. README y cabecera de `seed.sql` actualizados.
+- Verificado en el navegador (`next start`): 320, 375, 768 y 1280 px sin scroll horizontal. Tooltip "3.3 · 3 reviews · 0 critical". Marta: `/brands/voltra` da 200. Nuria y Dani: `/brands/voltra` da 404; `/brands/nope` da 404 para los tres. Con psql y el JWT de Dani, la vista suma 13 reseñas con media 2,77, las suyas; Nuria obtiene 0 filas en Voltra y `anon` recibe `permission denied`.
+- Arreglado durante la verificación: los puntos en 1 y en 5 quedaban cortados en el borde. Se resolvió con `padding` en el eje Y, sin tocar el dominio 1–5.
+
 ### 2026-09-25 · Grill antes de empezar
 - Q1: solo el lead de la marca. Los demás (Nuria, y también Dani como especialista de Voltra) reciben `notFound()`, como `/review` y `/replies/[id]`. El especialista tiene su tendencia en `/me`; el 403 lo da la API.
 - Q2: en la base local cada semana tiene n de 1 a 3 por marca, así que con "atenuar si n < 3" casi todo quedaba atenuado. Se mantiene el umbral y se agregan reseñas al seed; bajar el umbral para el demo sería hacer trampa con la regla.
 - Q3: 8 semanas, incluida la semana en curso marcada "so far"; con n chico la atenuación ya la señala.
-- Q4: semanas en UTC (`date_trunc('week', sent_at)`, lunes 00:00). Zona por marca, V2 → DECISIONS.md.
+- Q4: semanas en UTC. (Corregida al implementar: Europe/Madrid; ver Implementación.)
 - Q5: problemas frecuentes y tabla por especialista son "All time" desde las vistas de TASK-005, sin SQL nuevo. Problemas por gravedad y cantidad, con "last flagged".
 - Q6: "critical" cuenta reseñas con al menos una etiqueta crítica, igual que `specialist_brand_scores`.
 - Q7: `brand_events` entra: `ReferenceLine` en el lunes de su semana, etiqueta corta y la nota completa debajo. Primero en recortarse.
-- Q8: links desde el home (una tarjeta por marca que lidera) y desde la franja de marca en `/review`. Sin navegación en la cabecera.
+- Q8: links desde el home y desde la franja de marca en `/review`. (Cambiada después a (b): también navegación en la cabecera; ver Implementación.)
 - Q9: "últimas reseñas" se recorta (ya están en `/review` filtrando por marca) → Status.
 - Q10: un especialista que dejó la marca aparece con su nombre, sin distinción (RLS lo permite vía `authored_reply_in_led_brand`). Marca "Former" → V2.
 - Q11: tabla ordenada por críticas desc y media asc: quién necesita atención primero, no un ranking.

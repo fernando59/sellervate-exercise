@@ -1178,3 +1178,246 @@ Pasan `pnpm lint`, `pnpm build` y `pnpm typecheck`, y `rls-matrix.sql` da 24/24.
 
 Anotá los minutos reales de TASK-004 en `docs/TIMELOG.md`: se pasó bastante de los 60 min.
 
+
+---
+
+## 🧑 Usuario
+
+una cosa que encontre es que por ejemplo estoy aca http://localhost:3100/review?reply=cf7f9247-9983-4660-bc28-658654eef2ef, y cambio de lead a especialista, esta bien que de error, pero quizs una mejor pantalla y un boton de retornar o que te lleve al home
+
+
+### 🤖 Asistente
+
+Primero reproduzco lo que pasa al cambiar de persona con una respuesta abierta, y reviso qué hace el selector al cambiar.
+
+> 🔧 `Bash` — Read switch hook, app routes and TASK-007
+
+
+### 🤖 Asistente
+
+Commiteo antes el log de sesión que dejó el hook (regla de inicio de sesión) y reproduzco el caso.
+
+> 🔧 `Bash` — Commit session log
+
+> 🔧 `mcp__Claude_Browser__javascript_tool`
+
+> 🔧 `Bash` — Read Next 16 not-found file convention docs
+
+> 🔧 `Bash` — Check whether not-found can be async
+
+
+### 🤖 Asistente
+
+Next 16 allows an async `not-found`, so it can read who's signed in and offer the right way out. I build it.
+
+> 🔧 `Write`
+
+> 🔧 `Write`
+
+> 🔧 `Write`
+
+> 🔧 `Edit`
+
+> 🔧 `Bash` — Add import, typecheck, lint, build
+
+> 🔧 `mcp__Claude_Browser__preview_stop`
+
+> 🔧 `mcp__Claude_Browser__preview_start`
+
+
+### 🤖 Asistente
+
+The server was reused and may be serving the previous build. I restart it to be sure.
+
+> 🔧 `mcp__Claude_Browser__preview_stop`
+
+> 🔧 `mcp__Claude_Browser__preview_start`
+
+
+### 🤖 Asistente
+
+Port 3100 is taken by another process (probably yours), so this preview came up on 56856. I test there, going in as Marta, opening a reply and switching person.
+
+> 🔧 `mcp__Claude_Browser__javascript_tool`
+
+> 🔧 `mcp__Claude_Browser__computer`
+
+> 🔧 `mcp__Claude_Browser__javascript_tool`
+
+
+### 🤖 Asistente
+
+The HTML from `fetch` doesn't show the `<main>`. I check the page actually rendered in the tab as Nuria.
+
+> 🔧 `mcp__Claude_Browser__navigate`
+
+> 🔧 `mcp__Claude_Browser__get_page_text`
+
+
+### 🤖 Asistente
+
+The page comes out blank. That's a real bug, and I look for the cause in the logs.
+
+> 🔧 `mcp__Claude_Browser__read_console_messages`
+
+> 🔧 `mcp__Claude_Browser__preview_logs`
+
+> 🔧 `mcp__Claude_Browser__read_network_requests`
+
+> 🔧 `mcp__Claude_Browser__get_page_text`
+
+> 🔧 `mcp__Claude_Browser__browser_batch`
+
+> 🔧 `mcp__Claude_Browser__browser_batch`
+
+> 🔧 `mcp__Claude_Browser__find`
+
+
+### 🤖 Asistente
+
+I'm checking the change from the selector in the header. I look for the menu options.
+
+> 🔧 `mcp__Claude_Browser__read_page`
+
+> 🔧 `mcp__Claude_Browser__browser_batch`
+
+> 🔧 `mcp__Claude_Browser__browser_batch`
+
+
+### 🤖 Asistente
+
+Switching to Dani now shows the empty state with "Go home". Now I switch to Nuria (another lead) from the same URL.
+
+> 🔧 `mcp__Claude_Browser__browser_batch`
+
+> 🔧 `mcp__Claude_Browser__javascript_tool`
+
+
+### 🤖 Asistente
+
+They do have text; it was a quirk of the tool, not a bug. I check `/replies/<id>` not-found and 320 px, then commit.
+
+> 🔧 `mcp__Claude_Browser__browser_batch`
+
+
+### 🤖 Asistente
+
+Everything's fine at 320 px. I note it in TASK-004 and TASK-007 (these two routes' not-found is now done), commit and push.
+
+> 🔧 `Edit`
+
+> 🔧 `Bash` — Commit not-found screens and notes, push
+
+> 🔧 `Bash` — Add not-found screens to PR description
+
+
+### 🤖 Asistente
+
+Listo. Cambiar de persona con una respuesta abierta ahora lleva a una pantalla diseñada con salida, en vez de un error.
+
+**Qué pasaba**
+- **Cambiar a otro lead (Nuria):** aparecía el 404 genérico de Next, sin el diseño de la app y sin forma de volver.
+- **Cambiar a un especialista (Dani):** aparecía el aviso "The review queue is for brand leads", sin ningún botón, y encima el texto nombraba una página de feedback que todavía no existe.
+
+**Qué hice**
+- **`/review?reply=…` que no es de tu cola:** muestra "This reply is not in your queue", con **Back to the queue** si sos lead y **Go home** siempre. El texto aclara que, si recién cambiaste de persona, la respuesta era de la persona anterior.
+- **`/replies/[id]` ajena o inexistente:** muestra "Reply not found" con los mismos botones.
+- **Especialista en `/review`:** el aviso ahora tiene **Go home** y ya no nombra la página de feedback.
+- **Aislamiento:** el texto es igual si la respuesta no existe o es de otra marca, así la pantalla no revela que existe.
+
+**Verificado:** con una respuesta abierta, cambié de persona desde el selector del encabezado (Marta → Dani → Nuria) y cada uno vio su pantalla con sus botones. También abrí `/replies/<uuid inexistente>` y revisé las dos pantallas a 320 px sin scroll horizontal. Pasan typecheck, lint y build.
+
+Está commiteado como `fix:` en la rama del PR #5, subido, con la descripción del PR y las notas de la tarea actualizadas. En TASK-007 anoté que esas dos rutas ya tienen su pantalla; siguen pendientes la página de "no encontrado" global y las de carga y error.
+
+El puerto 3100 lo tenía ocupado otro proceso, probablemente tu `next start`, así que probé en otro puerto. Para ver el cambio en el tuyo, corré `pnpm build` y reiniciá el servidor.
+
+
+---
+
+## 🧑 Usuario
+
+hay algo que me di cuenta que falta, es que al menos deberia seleccionar un chip para poder guardar cambios
+
+
+### 🤖 Asistente
+
+Antes de implementarlo, un choque que conviene resolver: si **siempre** hay que elegir una etiqueta, no se puede guardar una respuesta perfecta (un 5 sin nada que corregir). En el seed hay reseñas así, y el ejemplo positivo de Leo es justamente eso.
+
+> 🔧 `AskUserQuestion`
+
+
+### 🤖 Asistente
+
+Uso esa regla: con nota de 1 a 3 hay que marcar al menos una etiqueta; con 4 o 5 es opcional. Primero reviso que el seed no tenga reseñas que la violen.
+
+> 🔧 `Bash` — Find seed reviews violating the new rule
+
+> 🔧 `Bash` — Read HB-7930 in seed
+
+> 🔧 `Bash` — Find HB-7930 review row in seed
+
+
+### 🤖 Asistente
+
+That review isn't in the seed. It probably came from your manual testing as Nuria. I check that no seed review breaks the rule.
+
+> 🔧 `Bash` — Check seed reviews for low scores without issues
+
+
+### 🤖 Asistente
+
+None in the seed. I implement the rule in the three places: schema, form and `save_review`.
+
+> 🔧 `Bash` — Add issue-required rule to schema and form
+
+> 🔧 `Read`
+
+> 🔧 `Edit`
+
+> 🔧 `Edit`
+
+> 🔧 `Bash` — Update tests, reset DB, run SQL/HTTP checks and build
+
+
+### 🤖 Asistente
+
+26/26 in SQL, and HTTP still fine. I restart the preview and test the form.
+
+> 🔧 `mcp__Claude_Browser__preview_stop`
+
+> 🔧 `mcp__Claude_Browser__preview_start`
+
+> 🔧 `mcp__Claude_Browser__javascript_tool`
+
+> 🔧 `mcp__Claude_Browser__javascript_tool`
+
+
+### 🤖 Asistente
+
+It works as intended. I commit, note it and update the PR.
+
+> 🔧 `Edit`
+
+> 🔧 `Bash` — Commit, push and update PR description
+
+
+### 🤖 Asistente
+
+Ahora, con nota de 1 a 3, no se puede guardar sin marcar al menos una etiqueta; con 4 o 5 las etiquetas siguen siendo opcionales.
+
+**Cómo se ve en la app:**
+- **Nota de 1 a 3:** el título de las etiquetas dice "What went wrong (required for 3 or lower)". Si guardás sin marcar ninguna, aparece debajo: "Pick what went wrong: a score of 3 or lower needs at least one issue.", y el aviso se va apenas marcás una.
+- **Nota 4 o 5:** dice "(optional)" y se guarda sin etiquetas.
+
+La regla también está en `save_review`, así que tampoco se puede saltar llamando a la API directamente. Corregí la migración en el mismo archivo, porque todavía no está en `main`.
+
+**Verificado:**
+- En el navegador: 3 sin etiqueta no guarda y muestra el error; al marcar una etiqueta desaparece; 5 sin etiqueta guarda y pasa a la siguiente.
+- `rls-matrix.sql` tiene 2 casos nuevos (26 de 26): un 3 sin etiquetas se rechaza y un 5 sin etiquetas se guarda.
+- Las pruebas por HTTP siguen igual.
+- Pasan typecheck, lint y build.
+
+Lo subí al PR #5 (`c6305e6`), con la descripción del PR y las notas de la tarea actualizadas.
+
+**Una cosa de tu base local:** la reseña de HB-7930 (nota 3, sin etiquetas) que vi antes no era del seed, seguramente la guardaste probando. Ya no existe porque reseteé la base (`pnpm db:reset`) para aplicar la migración. Eso también cerró las sesiones, así que tenés que volver a elegir persona. Si usás tu servidor en :3100, corré `pnpm build` y reinicialo para ver el cambio.
+

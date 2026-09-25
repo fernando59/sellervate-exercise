@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { FrequentIssues } from "@/features/brand-overview/components/frequent-issues";
 import { SpecialistTable } from "@/features/brand-overview/components/specialist-table";
-import { TrendSection } from "@/features/brand-overview/components/trend-section";
+import { BrandEvents, TrendSection } from "@/features/brand-overview/components/trend-section";
 import { summarizeTrend } from "@/features/brand-overview/trend";
 import { findLedBrand, getOptionalUser } from "@/server/auth/session";
 import {
@@ -49,11 +49,19 @@ export default async function BrandPage({ params }: PageProps<"/brands/[slug]">)
       </header>
 
       {specialists.length === 0 ? (
-        <EmptyState
-          title={`No reviews yet for ${brand.name}`}
-          description="Reviews from the queue show up here, grouped by the week each reply was sent."
-          action={<LinkButton href={`/review?brand=${brand.slug}`}>Open the review queue</LinkButton>}
-        />
+        <>
+          <EmptyState
+            title={`No reviews yet for ${brand.name}`}
+            description="Reviews from the queue show up here, grouped by the week each reply was sent."
+            action={<LinkButton href={`/review?brand=${brand.slug}`}>Open the review queue</LinkButton>}
+          />
+          {/* A change can come before the first review; it still belongs on record. */}
+          {trend.events.length > 0 ? (
+            <section className="rounded-lg border border-line bg-surface p-4 sm:p-5">
+              <BrandEvents events={trend.events} />
+            </section>
+          ) : null}
+        </>
       ) : (
         <>
           <TrendSection weeks={trend.weeks} events={trend.events} summary={summary} weekCount={TREND_WEEKS} />

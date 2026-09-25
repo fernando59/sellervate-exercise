@@ -55,19 +55,8 @@ export function TrendSection({
       </div>
 
       {events.length > 0 ? (
-        <div className="flex flex-col gap-1 border-t border-line pt-3">
-          <h3 className="text-xs font-semibold">What changed</h3>
-          <ol className="flex flex-col gap-1">
-            {events.map((e, i) => (
-              <li key={`${e.happenedOn}-${i}`} className="flex gap-2 text-sm">
-                <span className="font-mono text-2xs leading-5 text-ink-muted">{i + 1}</span>
-                <span className="min-w-0">
-                  <span className="font-mono text-2xs text-ink-muted">{formatShortDay(e.happenedOn)} · </span>
-                  {e.note}
-                </span>
-              </li>
-            ))}
-          </ol>
+        <div className="border-t border-line pt-3">
+          <BrandEvents events={events} />
         </div>
       ) : null}
 
@@ -96,6 +85,26 @@ export function TrendSection({
         </tbody>
       </table>
     </section>
+  );
+}
+
+/** What the brand changed and when, numbered like the chart's reference lines. */
+export function BrandEvents({ events }: { events: BrandEvent[] }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <h3 className="text-xs font-semibold">What changed</h3>
+      <ol className="flex flex-col gap-1">
+        {events.map((e, i) => (
+          <li key={`${e.happenedOn}-${i}`} className="flex gap-2 text-sm">
+            <span className="font-mono text-2xs leading-5 text-ink-muted">{i + 1}</span>
+            <span className="min-w-0">
+              <span className="font-mono text-2xs text-ink-muted">{formatShortDay(e.happenedOn)} · </span>
+              {e.note}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 

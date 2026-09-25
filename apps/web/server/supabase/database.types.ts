@@ -306,6 +306,24 @@ export type Database = {
       }
     }
     Views: {
+      brand_weekly_scores: {
+        Row: {
+          avg_score: number | null
+          brand_id: string | null
+          critical_count: number | null
+          review_count: number | null
+          week: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviewed_replies: {
         Row: {
           brand_id: string | null

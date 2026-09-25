@@ -1,13 +1,13 @@
 ---
 id: TASK-004
 titulo: Cola de revisión del lead y formulario de reseña
-estado: doing
+estado: testing
 prioridad: alta
 estimacion: 60
 creada: 2026-09-23
 actualizada: 2026-09-25
 rama: feat/review-queue
-pr:
+pr: https://github.com/fernando59/sellervate-exercise/pull/5
 tags: [ui, review, forms]
 depende_de: [TASK-003]
 bloqueada_por:

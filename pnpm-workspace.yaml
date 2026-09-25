@@ -5,3 +5,7 @@ allowBuilds:
   sharp: false
   unrs-resolver: false
   supabase: true
+
+# Save exact versions on pnpm add. pnpm 11 reads this from here; save-exact in
+# .npmrc would be ignored (.npmrc is auth and registry only since v11).
+saveExact: true

@@ -14,7 +14,7 @@ export default async function MyFeedbackPage() {
   const user = await getOptionalUser();
   if (!user) redirect("/");
 
-  const [items, issueTypes] = await Promise.all([listMyFeedback(user.id), listIssueTypes()]);
+  const [items, issueTypes] = await Promise.all([listMyFeedback(), listIssueTypes()]);
   const brands = summarizeByBrand(items, user.memberships, issueTypes);
 
   return (

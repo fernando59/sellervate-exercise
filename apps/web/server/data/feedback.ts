@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getCurrentUser } from "@/server/auth/session";
 import { createClient } from "@/server/supabase/server";
 
 export type FeedbackReview = {
@@ -26,8 +27,11 @@ export type FeedbackItem = {
  * The caller's own reviewed replies, newest first. The specialist filter is in
  * the query on purpose: RLS alone would return a lead every reply of their
  * team, and /me computes its averages from exactly these rows (TASK-005, Q1).
+ * The id comes from the session, not from a parameter, so no caller can point
+ * "my" feedback at someone else.
  */
-export async function listMyFeedback(userId: string): Promise<FeedbackItem[]> {
+export async function listMyFeedback(): Promise<FeedbackItem[]> {
+  const { id: userId } = await getCurrentUser();
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("replies")

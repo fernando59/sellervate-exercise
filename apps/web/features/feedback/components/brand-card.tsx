@@ -26,7 +26,7 @@ export function BrandCard({ summary }: { summary: BrandFeedback }) {
         <>
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div className="flex flex-col">
-              <span className="text-xs text-ink-muted">Your average in {name}</span>
+              <span className="text-xs text-ink-muted">{summary.name ? `Your average in ${summary.name}` : "Your average"}</span>
               <span className="font-mono text-2xl font-medium tabular-nums">
                 {summary.average.toFixed(1)}
                 <span className="ml-2 text-xs text-ink-muted">

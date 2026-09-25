@@ -88,7 +88,11 @@ exception when insufficient_privilege then
   raise notice 'ok: Nuria cannot review a Voltra reply (RLS with check)';
 end $$;
 
--- Nuria claims a Hebra brand_id for the Voltra reply: the composite FK rejects it.
+reset role;
+
+-- A review claims a Hebra brand_id for a Voltra reply: the composite FK rejects
+-- it. Run as the owner, since no app role can insert reviews directly anymore
+-- (save_review migration); this checks the schema, not the grants.
 do $$
 begin
   insert into public.reviews (reply_id, brand_id, reviewer_id, score)
@@ -98,7 +102,6 @@ begin
 exception when foreign_key_violation then
   raise notice 'ok: a review cannot lie about its brand (composite FK)';
 end $$;
-reset role;
 
 -- Marta tries to move one of her reviews to another reviewer, and to delete it.
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
@@ -230,6 +233,39 @@ begin
 end $$;
 
 -- save_review (TASK-004) ---------------------------------------------------------
+
+-- Marta skips save_review and writes directly, as a POST to /rest/v1/reviews
+-- would: a 5 with a critical issue. Direct writes are revoked.
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+begin
+  insert into public.reviews (reply_id, brand_id, reviewer_id, score)
+  values (current_setting('sellervate.voltra_reply')::uuid, current_setting('sellervate.voltra_brand')::uuid,
+          'a0000000-0000-4000-8000-000000000001', 5);
+  raise exception 'FAIL: a lead inserted a review directly';
+exception when insufficient_privilege then
+  raise notice 'ok: reviews are written only through save_review';
+end $$;
+do $$
+begin
+  delete from public.review_issues
+  where review_id in (select id from public.reviews where reviewer_id = 'a0000000-0000-4000-8000-000000000001');
+  raise exception 'FAIL: a lead removed issues directly';
+exception when insufficient_privilege then
+  raise notice 'ok: review issues are written only through save_review';
+end $$;
+reset role;
+
+-- The comment limit holds for any writer, not only the function.
+do $$
+begin
+  update public.reviews set comment = repeat('x', 2001)
+  where id = (select id from public.reviews limit 1);
+  raise exception 'FAIL: a 2001-character comment was stored';
+exception when check_violation then
+  raise notice 'ok: comments are capped at 2000 characters (check constraint)';
+end $$;
 
 -- Nuria saves a review on a leaked Voltra reply id: she cannot see the reply.
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000002","role":"authenticated"}', true);

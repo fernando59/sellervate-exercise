@@ -1,7 +1,7 @@
 ---
 id: TASK-006
 titulo: Página de marca con tendencia semanal y problemas frecuentes
-estado: testing
+estado: done
 prioridad: media
 estimacion: 60
 creada: 2026-09-23
@@ -29,18 +29,18 @@ Descartado en el grill: abrir la página al especialista con sus datos (su tende
 
 ## Criterios de aceptación
 
-- [ ] Como Marta, `/brands/voltra`: tendencia de 8 semanas (incluida la semana en curso, marcada "so far"), eje Y fijo 1–5
-- [ ] Las semanas sin reseñas son un hueco, no un cero; los puntos con n < 3 se ven atenuados
-- [ ] Tooltip "4.1 · 12 reviews · 0 critical" (críticas = reseñas con al menos una etiqueta crítica)
-- [ ] Resumen arriba: media de las 8 semanas, reseñas y críticas
-- [ ] El evento "Diagnostic checklist..." aparece como línea vertical en su semana, con la nota completa debajo del gráfico (recortable)
-- [ ] Problemas frecuentes, "All time", ordenados por gravedad y cantidad, con "last flagged <fecha>"
-- [ ] Tabla por especialista, "All time": media, reseñas, críticas; ordenada por críticas desc y media asc (recortable)
-- [ ] Como Nuria y como Dani, `/brands/voltra` responde 404; `/brands/no-existe` también
-- [ ] Una marca sin reseñas muestra un `EmptyState` con link a `/review`
-- [ ] El home enlaza a la página de cada marca que lidera, la franja de marca en `/review` también, y la cabecera tiene navegación según el rol
-- [ ] Sin scroll horizontal a 320, 375, 768 y 1280 px; la tabla por especialista se apila en el móvil
-- [ ] El gráfico tiene una tabla equivalente detrás de "Show the numbers" y el SVG va con `aria-hidden`
+- [x] Como Marta, `/brands/voltra`: tendencia de 8 semanas (incluida la semana en curso, marcada "so far"), eje Y fijo 1–5
+- [x] Las semanas sin reseñas son un hueco, no un cero; los puntos con n < 3 se ven atenuados
+- [x] Tooltip "4.1 · 12 reviews · 0 critical" (críticas = reseñas con al menos una etiqueta crítica)
+- [x] Resumen arriba: media de las 8 semanas, reseñas y críticas
+- [x] El evento "Diagnostic checklist..." aparece como línea vertical en su semana, con la nota completa debajo del gráfico (recortable)
+- [x] Problemas frecuentes, "All time", ordenados por gravedad y cantidad, con "last flagged <fecha>"
+- [x] Tabla por especialista, "All time": media, reseñas, críticas; ordenada por críticas desc y media asc (recortable)
+- [x] Como Nuria y como Dani, `/brands/voltra` responde 404; `/brands/no-existe` también
+- [x] Una marca sin reseñas muestra un `EmptyState` con link a `/review`
+- [x] El home enlaza a la página de cada marca que lidera, la franja de marca en `/review` también, y la cabecera tiene navegación según el rol
+- [x] Sin scroll horizontal a 320, 375, 768 y 1280 px; la tabla por especialista se apila en el móvil
+- [x] El gráfico tiene una tabla equivalente detrás de "Show the numbers" y el SVG va con `aria-hidden`
 
 ## Fuera de alcance
 
@@ -110,6 +110,9 @@ Recharts 3 (`LineChart`, `ReferenceLine`, `connectNulls`, `ResponsiveContainer` 
 - No mostrar al especialista agregados del equipo.
 
 ## Notas de implementación
+
+### 2026-09-25 · Mergeado
+PR #7 mergeado con merge commit, sin review escrita en GitHub.
 
 ### 2026-09-25 · Arreglos que no debían quedar para la review
 El usuario marcó que la lista de puntos para su review tenía cosas arreglables (`suggestion:`/`question:`/`leaving this:`) y una afirmación sin verificar. Se arreglaron en la rama:

@@ -169,9 +169,9 @@ Actualizar esta lista cada vez que se mergea un PR.
 - [x] PR3 `feat/authz`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/4), con review escrita
 - [x] PR4 `feat/review-queue`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/5), con review escrita
 - [x] PR5 `feat/my-feedback`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/6), con review escrita
-- [ ] PR6 `feat/brand-overview`: en curso
-- [ ] PR7 `feat/states-polish`
-- [ ] `docs/decisions`: DECISIONS.md, README final, TIMELOG
+- [x] PR6 `feat/brand-overview`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/7), sin review escrita
+- [ ] PR7 `feat/states-polish`: no empezado (TASK-007 en backlog, "Not started" en DECISIONS.md)
+- [x] `docs/decisions`: DECISIONS.md, README final y TIMELOG, en un commit directo a `main` (pedido del usuario). Prueba terminada.
 
 Pendientes conocidos:
 - Nunca usar comillas invertidas dentro de strings de `bash -c`/`node -e`: bash las ejecuta. Para editar texto con Markdown, usar la herramienta Edit.

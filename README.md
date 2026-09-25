@@ -62,4 +62,4 @@ Started from `create-next-app` (Next.js 16, Tailwind template). No other starter
 
 ## Time spent
 
-See [`docs/TIMELOG.md`](docs/TIMELOG.md).
+**5 h 58 min** of real work, timed, against a 6 h cap. Breakdown in [`docs/TIMELOG.md`](docs/TIMELOG.md). Decisions, trade-offs and status: [`docs/DECISIONS.md`](docs/DECISIONS.md).

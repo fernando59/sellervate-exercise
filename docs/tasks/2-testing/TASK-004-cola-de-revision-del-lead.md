@@ -85,6 +85,11 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ## Notas de implementación
 
+### 2026-09-25 · Etiqueta obligatoria con nota baja (pedido del usuario)
+- Con nota ≤ 3 hay que marcar al menos una etiqueta; con 4 o 5 es opcional (decisión del usuario, entre cuatro opciones). Una respuesta perfecta sigue pudiendo guardarse sin inventar un problema, y una nota baja siempre dice qué falló, que es lo que después muestra si el mismo error vuelve.
+- Está en el `superRefine` (error en el campo de etiquetas), en la leyenda ("required for 3 or lower" / "optional") y en `save_review` (22023). `rls-matrix.sql` suma 2 casos (26 en total).
+- Se probó en el navegador: con 3 y sin etiqueta no guarda y muestra el error; al marcar una etiqueta el error desaparece; con 5 y sin etiqueta guarda.
+
 ### 2026-09-25 · Pantallas de "no encontrado" (pedido del usuario al probar)
 - Con una respuesta abierta en `/review?reply=…`, cambiar a otro lead mostraba el 404 genérico de Next, sin diseño y sin salida. Cambiar a un especialista mostraba el vacío sin ningún botón, y además mencionaba una página de feedback que todavía no existe.
 - Se agregaron `app/review/not-found.tsx` y `app/replies/[id]/not-found.tsx`, que son async, leen a la persona y ofrecen "Back to the queue" si es lead, y "Go home" siempre. El texto es el mismo si la respuesta no existe o es ajena, así no revela nada. El vacío para quien no es lead suma "Go home". Se agregó `ui/link-button.tsx`.

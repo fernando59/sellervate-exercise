@@ -16,7 +16,8 @@
 --          PostgREST answers a PTxyz code with HTTP xyz, so a direct API
 --          call gets a 404, not the 500 an unmapped P0002 would give.
 --   42501  no session, or the caller can see the reply but does not lead it
---   22023  invalid input (score, comment, issue codes, critical issue with score > 2)
+--   22023  invalid input (score, comment, issue codes, critical issue with
+--          score > 2, no issue with score <= 3)
 --
 -- brand_id and reviewer_id are not parameters: brand_id comes from the reply
 -- row and reviewer_id from auth.uid(). is_exemplar is left out until it has UI;
@@ -105,6 +106,12 @@ begin
     select 1 from public.issue_types it where it.code = any (v_codes) and it.severity = 'critical'
   ) then
     raise exception 'A critical issue caps the score at 2.' using errcode = '22023';
+  end if;
+
+  -- A low score has to say what went wrong; the issue codes are what shows
+  -- whether the same mistake comes back. 4 and 5 may have none.
+  if p_score <= 3 and cardinality(v_codes) = 0 then
+    raise exception 'A score of 3 or lower needs at least one issue.' using errcode = '22023';
   end if;
 
   insert into public.reviews (reply_id, brand_id, reviewer_id, score, comment)

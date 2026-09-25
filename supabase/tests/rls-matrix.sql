@@ -332,6 +332,15 @@ begin
     raise notice 'ok: retired issue codes are rejected (22023)';
   end;
 
+  begin
+    perform public.save_review(reply, 3, '', '{}');
+    raise exception 'FAIL: a 3 without issues was saved';
+  exception when invalid_parameter_value then
+    raise notice 'ok: a score of 3 or lower needs an issue (22023)';
+  end;
+  perform public.save_review(reply, 5, '', '{}');
+  raise notice 'ok: a 5 needs no issue';
+
   first_id := public.save_review(reply, 2, '  Diagnose first.  ', '{skipped_procedure,tone}');
   second_id := public.save_review(reply, 1, 'Diagnose first.', '{skipped_procedure,length}');
   select array_agg(issue_code order by issue_code) into issues from public.review_issues where review_id = second_id;

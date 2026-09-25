@@ -9,6 +9,11 @@ import { z } from "zod";
 export const COMMENT_MAX = 2000;
 export const SCORES = [1, 2, 3, 4, 5] as const;
 export const CRITICAL_SCORE_CAP = 2;
+/**
+ * A score this low has to say what went wrong: the issue codes are what later
+ * shows whether the same mistake comes back. 4 and 5 may have none.
+ */
+export const ISSUE_REQUIRED_MAX_SCORE = 3;
 
 /**
  * The critical-issue cap needs the catalog, which lives in the database, so
@@ -44,6 +49,13 @@ export function reviewFormSchema(criticalCodes: readonly string[]) {
           code: "custom",
           path: ["score"],
           message: `A critical issue caps the score at ${CRITICAL_SCORE_CAP}.`,
+        });
+      }
+      if (value.score <= ISSUE_REQUIRED_MAX_SCORE && value.issueCodes.length === 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["issueCodes"],
+          message: `Pick what went wrong: a score of ${ISSUE_REQUIRED_MAX_SCORE} or lower needs at least one issue.`,
         });
       }
     });

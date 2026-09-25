@@ -10,6 +10,7 @@ import { queueHref, type QueueParams } from "../queue-params";
 import {
   COMMENT_MAX,
   CRITICAL_SCORE_CAP,
+  ISSUE_REQUIRED_MAX_SCORE,
   REVIEW_FORM_LABELS as L,
   SCORES,
   reviewFormDefaults,
@@ -64,6 +65,8 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
   // save_review still enforce it.
   const issueCodes = useWatch({ control, name: "issueCodes" });
   const capped = issueCodes?.some((code) => criticalCodes.includes(code)) ?? false;
+  const score = useWatch({ control, name: "score" });
+  const issuesRequired = score !== undefined && score <= ISSUE_REQUIRED_MAX_SCORE;
 
   function toggleIssue(code: string, current: string[]): string[] {
     if (current.includes(code)) return current.filter((c) => c !== code);
@@ -180,7 +183,12 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
       </fieldset>
 
       <fieldset className="flex min-w-0 flex-col gap-3">
-        <legend className="mb-2 text-sm font-semibold">{L.issues}</legend>
+        <legend className="mb-2 text-sm font-semibold">
+          {L.issues}{" "}
+          <span className="font-normal text-ink-muted">
+            {issuesRequired ? `(required for ${ISSUE_REQUIRED_MAX_SCORE} or lower)` : "(optional)"}
+          </span>
+        </legend>
         <Controller
           control={control}
           name="issueCodes"
@@ -224,6 +232,11 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
             </div>
           )}
         />
+        {errors.issueCodes ? (
+          <p role="alert" className="text-xs text-bad">
+            {errors.issueCodes.message}
+          </p>
+        ) : null}
       </fieldset>
 
       <div className="flex flex-col gap-2">

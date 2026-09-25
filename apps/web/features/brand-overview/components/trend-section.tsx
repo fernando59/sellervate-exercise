@@ -5,7 +5,8 @@ import { SMALL_SAMPLE, TrendChart } from "./trend-chart";
 
 /**
  * The headline numbers, the weekly chart, what changed and when, and the same
- * data as a table for screen readers. Labels are formatted here, on the
+ * data as a table behind "Show the numbers": the way in for keyboard and
+ * screen reader users, since the chart SVG is aria-hidden. Labels are formatted here, on the
  * server, so the client chart gets plain serialisable points.
  */
 export function TrendSection({
@@ -60,30 +61,33 @@ export function TrendSection({
         </div>
       ) : null}
 
-      <table className="sr-only">
-        <caption>Weekly average score, last {weekCount} weeks</caption>
-        <thead>
-          <tr>
-            <th scope="col">Week of</th>
-            <th scope="col">Average</th>
-            <th scope="col">Reviews</th>
-            <th scope="col">Critical</th>
-          </tr>
-        </thead>
-        <tbody>
-          {points.map((p) => (
-            <tr key={p.label}>
-              <th scope="row">
-                {p.label}
-                {p.partial ? " (so far)" : ""}
-              </th>
-              <td>{p.average === null ? "No reviews" : p.average.toFixed(1)}</td>
-              <td>{p.reviewCount}</td>
-              <td>{p.criticalCount}</td>
+      <details className="border-t border-line pt-3">
+        <summary className="cursor-pointer text-xs font-semibold text-accent">Show the numbers</summary>
+        <table className="mt-2 w-full text-sm">
+          <caption className="sr-only">Weekly average score, last {weekCount} weeks</caption>
+          <thead>
+            <tr className="border-b border-line text-left text-2xs text-ink-muted">
+              <th scope="col" className="py-1.5 font-medium">Week of</th>
+              <th scope="col" className="py-1.5 text-right font-medium">Average</th>
+              <th scope="col" className="py-1.5 text-right font-medium">Reviews</th>
+              <th scope="col" className="py-1.5 text-right font-medium">Critical</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-line font-mono tabular-nums">
+            {points.map((p) => (
+              <tr key={p.label}>
+                <th scope="row" className="py-1.5 text-left font-sans font-normal">
+                  {p.label}
+                  {p.partial ? " (so far)" : ""}
+                </th>
+                <td className="py-1.5 text-right">{p.average === null ? "–" : p.average.toFixed(1)}</td>
+                <td className="py-1.5 text-right">{p.reviewCount}</td>
+                <td className={`py-1.5 text-right ${p.criticalCount > 0 ? "text-bad" : ""}`}>{p.criticalCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
     </section>
   );
 }

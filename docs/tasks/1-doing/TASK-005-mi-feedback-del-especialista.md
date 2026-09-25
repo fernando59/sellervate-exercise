@@ -86,6 +86,10 @@ Server Components que leen de `server/data`. Colores semánticos solo para resul
 
 ## Notas de implementación
 
+### 2026-09-25 · Revisión de los subagentes (ronda 3)
+- `tenant-isolation-reviewer`: sin fugas. Probó las tres vistas con el JWT de las cinco personas, por SQL y por REST: cada especialista solo ve lo suyo, los leads el desglose de sus marcas (lo que necesita TASK-006), `anon` y cualquier escritura por la vista dan `permission denied`, y ninguna búsqueda armada con `cleanSearch` sale de su filtro. Arreglado: comentario en `reviewed_replies` que dice que es de solo lectura por grant (es auto-updatable). Para DECISIONS.md: `create index` sin `concurrently` bloquearía escrituras a volumen del importador; las vistas atan el tipo de las columnas que usan; el `array(...)` por fila de `reviewed_replies` se paga en la vista del lead.
+- `code-reviewer`: sin hallazgos bloqueantes. Confirmó `or()`, `contains()`, `range()` y el conteo `head` contra el código de `postgrest-js`.
+
 ### 2026-09-25 · Ronda 3 del grill: volumen del helpdesk
 El usuario pidió paginación y buscador: con el importador, un especialista va a tener miles de respuestas. Esto reemplaza Q1 y Q5.
 - Q14: tres vistas `security_invoker` en una migración nueva: `reviewed_replies` (feed filtrable), `specialist_brand_scores` y `specialist_issue_counts`. No filtran por persona para que TASK-006 las reutilice por marca; `/me` agrega `specialist_id = user`. Las últimas 5 notas, una consulta chica por marca.

@@ -85,6 +85,11 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ## Notas de implementación
 
+### 2026-09-25 · Pantallas de "no encontrado" (pedido del usuario al probar)
+- Con una respuesta abierta en `/review?reply=…`, cambiar a otro lead mostraba el 404 genérico de Next, sin diseño y sin salida. Cambiar a un especialista mostraba el vacío sin ningún botón, y además mencionaba una página de feedback que todavía no existe.
+- Se agregaron `app/review/not-found.tsx` y `app/replies/[id]/not-found.tsx`, que son async, leen a la persona y ofrecen "Back to the queue" si es lead, y "Go home" siempre. El texto es el mismo si la respuesta no existe o es ajena, así no revela nada. El vacío para quien no es lead suma "Go home". Se agregó `ui/link-button.tsx`.
+- Se verificó cambiando de persona desde el selector con una respuesta abierta (Marta → Dani → Nuria), y a 320 px.
+
 ### 2026-09-25 · Correcciones después de abrir el PR (pedido del usuario)
 El usuario pidió no dejar nada arreglable como punto de review. Esto quedó como regla en CLAUDE.md. Se corrigió:
 - La regla de visibilidad estaba duplicada en `save_review`. Ahora vive en `private.can_see_reply()`, que usan tanto `replies_select` (`alter policy`) como la función. La matriz de RLS da los mismos números antes y después.

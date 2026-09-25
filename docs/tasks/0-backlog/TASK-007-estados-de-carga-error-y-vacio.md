@@ -75,4 +75,7 @@ No mostrar `error.message` crudo.
 
 ## Notas de implementación
 
+### 2026-09-25 · Adelantado en TASK-004
+- `/review` y `/replies/[id]` ya tienen su `not-found.tsx` diseñado, con salida a la cola o al inicio (`ui/link-button.tsx`). Faltan el `not-found` global, los `loading.tsx` y los `error.tsx`.
+
 (vacío — no empezada)

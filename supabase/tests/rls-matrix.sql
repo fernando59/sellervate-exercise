@@ -187,6 +187,23 @@ begin
 end $$;
 reset role;
 
+-- The global "revoke execute on functions from public" in the authorization
+-- migration only affects functions created after it. The extensions the app
+-- relies on (pgcrypto, uuid-ossp) were installed before, so none of their
+-- functions, nor any of ours, may have lost execute for authenticated.
+do $$
+declare
+  lost text;
+begin
+  select string_agg(n.nspname || '.' || p.proname, ', ') into lost
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname in ('extensions', 'public')
+    and pg_get_userbyid(p.proowner) = 'postgres'
+    and not has_function_privilege('authenticated', p.oid, 'execute');
+  if lost is not null then raise exception 'FAIL: authenticated lost execute on %', lost; end if;
+  raise notice 'ok: the global revoke did not strip execute from existing functions';
+end $$;
+
 -- A security definer function created later in public is not callable by anon.
 create function public.zz_rls_matrix_probe() returns int language sql security definer as $$ select 1 $$;
 do $$

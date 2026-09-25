@@ -143,7 +143,8 @@ alter default privileges for role postgres in schema public
 -- line a new security definer function in public would be callable by anyone
 -- through /rest/v1/rpc with the anon key. Side effect: functions that extensions
 -- installed later create as postgres also lose the PUBLIC grant and need an
--- explicit one.
+-- explicit one. The extensions in use today (pgcrypto, uuid-ossp) were installed
+-- before this migration and keep theirs; supabase/tests/rls-matrix.sql checks it.
 alter default privileges for role postgres in schema public
   revoke execute on functions from anon;
 alter default privileges for role postgres

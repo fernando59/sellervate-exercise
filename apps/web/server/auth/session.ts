@@ -75,6 +75,15 @@ export function requireMember(user: CurrentUser, brandSlug: string): Membership 
 }
 
 /**
+ * The caller's lead membership in the brand with this slug, or null. For pages
+ * that answer not found instead of 403: a brand the caller does not lead and a
+ * brand that does not exist look the same (TASK-006, Q1).
+ */
+export function findLedBrand(user: CurrentUser, brandSlug: string): Membership | null {
+  return user.memberships.find((m) => m.slug === brandSlug && m.role === "lead") ?? null;
+}
+
+/**
  * Throws ForbiddenError unless the caller leads this brand. Pass the brand_id
  * read from the database row being acted on, never one taken from the request.
  */

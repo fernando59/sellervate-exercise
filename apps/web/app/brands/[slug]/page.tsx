@@ -4,7 +4,7 @@ import { FrequentIssues } from "@/features/brand-overview/components/frequent-is
 import { SpecialistTable } from "@/features/brand-overview/components/specialist-table";
 import { TrendSection } from "@/features/brand-overview/components/trend-section";
 import { summarizeTrend } from "@/features/brand-overview/trend";
-import { getOptionalUser } from "@/server/auth/session";
+import { findLedBrand, getOptionalUser } from "@/server/auth/session";
 import {
   TREND_WEEKS,
   getBrand,
@@ -27,7 +27,7 @@ export default async function BrandPage({ params }: PageProps<"/brands/[slug]">)
   // not exist, get the same not found, so the page never confirms a brand
   // exists (TASK-006, Q1).
   const { slug } = await params;
-  const membership = user.memberships.find((m) => m.slug === slug && m.role === "lead");
+  const membership = findLedBrand(user, slug);
   if (!membership) notFound();
   const brand = await getBrand(membership.brandId);
   if (!brand) notFound();

@@ -481,6 +481,7 @@ Total: ~5 h 45 min + 15 min de colchón.
 - borrado duro de filas referenciadas
 - datos de seed dentro de migraciones
 - FKs sin índice
+- una migración ya mergeada que se editó en vez de agregar una nueva
 
 **No vale la pena discutir**
 - nombres de variables o clases

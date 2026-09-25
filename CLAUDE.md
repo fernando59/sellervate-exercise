@@ -84,6 +84,7 @@ Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuar
 - **Nunca** usar la clave `service_role` en código de la app; solo en el seed.
 - `brand_id` sale de la fila en la base de datos, **nunca** del input del request.
 - Toda tabla nueva lleva RLS **en la misma migración**. Las vistas llevan `security_invoker = on`.
+- **Una migración que ya está en `main` no se edita nunca**: cualquier cambio va en una migración nueva, porque otra base puede haberla aplicado y Supabase no la vuelve a correr. Mientras el PR está abierto y la migración solo se aplicó en la base local, se puede corregir en el mismo archivo, y el mensaje del commit lo dice.
 - Nada de enums de Postgres para catálogos; usar tablas o `text` + `check`.
 - **Ninguna funcionalidad de IA ni scoring automático.** Las ideas sobre modelos van a DECISIONS.md en un párrafo.
 - El seed es creíble (nada de lorem ipsum), las marcas suenan distintas y va en `seed.sql`, nunca en las migraciones.

@@ -60,14 +60,22 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
   });
 
   // A critical issue caps the score. The buttons above the cap are disabled so
-  // the rule shows while choosing, not only on save; the refine and
-  // save_review still enforce it. A score already above the cap stays
-  // selected and flagged: changing the lead's judgement for them is worse
-  // than asking them to pick again.
+  // the rule shows while choosing, not as an error on save; the refine and
+  // save_review still enforce it.
   const issueCodes = useWatch({ control, name: "issueCodes" });
-  const score = useWatch({ control, name: "score" });
   const capped = issueCodes?.some((code) => criticalCodes.includes(code)) ?? false;
-  const overCap = capped && score !== undefined && score > CRITICAL_SCORE_CAP;
+
+  function toggleIssue(code: string, current: string[]): string[] {
+    if (current.includes(code)) return current.filter((c) => c !== code);
+    // Ticking a critical issue clears a score above the cap instead of
+    // lowering it: the lead picks 1 or 2, the form does not pick for them.
+    const score = getValues("score");
+    if (criticalCodes.includes(code) && score !== undefined && score > CRITICAL_SCORE_CAP) {
+      // The input type says number; an empty score is what the defaults use too.
+      setValue("score", undefined as unknown as number, { shouldDirty: true });
+    }
+    return [...current, code];
+  }
 
   // 1–5 set the score, J/K move through the queue. Ignored while typing.
   useEffect(() => {
@@ -133,10 +141,7 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
                 const checked = field.value === n;
                 const blocked = capped && n > CRITICAL_SCORE_CAP;
                 const look = checked
-                  ? blocked
-                    ? // Still the selection, filled like one, but in bad: it has to be changed.
-                      "border-bad bg-bad text-surface"
-                    : "border-accent bg-accent text-accent-ink"
+                  ? "border-accent bg-accent text-accent-ink"
                   : blocked
                     ? "border-line bg-ground text-ink-muted opacity-40"
                     : "border-line bg-ground hover:border-line-strong";
@@ -164,11 +169,11 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
           )}
         />
         {capped ? (
-          <p id="score-cap" role={overCap ? "alert" : undefined} className={`text-xs ${overCap ? "text-bad" : "text-ink-muted"}`}>
-            A critical issue caps the score at {CRITICAL_SCORE_CAP}.{overCap ? ` Pick 1 or ${CRITICAL_SCORE_CAP}.` : ""}
+          <p id="score-cap" className="text-xs text-ink-muted">
+            A critical issue caps the score at {CRITICAL_SCORE_CAP}.
           </p>
         ) : null}
-        {errors.score && !overCap ? (
+        {errors.score ? (
           <p role="alert" className="text-xs text-bad">
             {errors.score.message}
           </p>
@@ -195,13 +200,7 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
                           <input
                             type="checkbox"
                             checked={checked}
-                            onChange={() =>
-                              field.onChange(
-                                checked
-                                  ? (field.value ?? []).filter((c) => c !== it.code)
-                                  : [...(field.value ?? []), it.code],
-                              )
-                            }
+                            onChange={() => field.onChange(toggleIssue(it.code, field.value ?? []))}
                             onBlur={field.onBlur}
                             className="peer sr-only"
                           />

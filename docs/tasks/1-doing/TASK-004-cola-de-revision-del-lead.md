@@ -87,7 +87,7 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ### 2026-09-25 · Cambio de Q18 (pedido del usuario al probar la UI)
 - Con una etiqueta crítica marcada, los botones 3–5 se deshabilitan y los atajos `3`–`5` se ignoran. Así la regla se ve mientras se elige, y no recién al guardar. No sugiere ninguna nota: la elección entre 1 y 2 sigue siendo del lead. El argumento original de Q18 ("la UI propondría la nota") era flojo.
-- Si la nota ya era mayor que 2 cuando se marca la crítica, no se cambia sola: queda seleccionada en rojo, con "Pick 1 or 2.", y no se puede guardar hasta elegir de nuevo.
+- Si la nota ya era mayor que 2 cuando se marca la crítica, se **limpia** (decisión del usuario). La primera versión la dejaba seleccionada y marcada en rojo, pero se sentía como un error de validación. Tampoco se baja sola a 2: el formulario no elige la nota por el lead. Al guardar sin nota aparece "Pick a score from 1 to 5.".
 - El `refine` y `save_review` siguen como respaldo.
 
 ### 2026-09-25 · Hallazgos de los subagentes

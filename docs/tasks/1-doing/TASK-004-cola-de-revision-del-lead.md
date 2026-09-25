@@ -46,7 +46,7 @@ La action sigue el orden `getCurrentUser → parse → cargar la respuesta (RLS)
 ## Cómo se valida
 
 1. Como Marta, `/review`: 7 respuestas de ayer, 2 reseñadas.
-2. Abrir VOL-48660 (el manillar flojo con devolución directa), poner 1, `skipped_procedure`, comentario, "Save and next". Vuelve a la lista con 3 reseñadas.
+2. Abrir VOL-48660 (el manillar flojo con devolución directa), poner 1, `skipped_procedure`, comentario, "Save and next". Pasa a la siguiente sin reseñar y la cabecera dice 3 reseñadas.
 3. Como Nuria, `/review`: solo Hebra.
 4. Como Dani, `/replies/<id de VOL-48644>`: la ve. `/replies/<id de HB-7921>`: 404.
 
@@ -84,6 +84,22 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 - No guardar etiquetas como texto libre.
 
 ## Notas de implementación
+
+### 2026-09-25 · Grill de TASK-004
+- Q1 "Ayer" = día calendario en `APP_TIME_ZONE = "Europe/Madrid"`, aislado en `server/time.ts` (`yesterdayRange()`). No escala a equipos en varios husos: lo correcto sería `brands.time_zone` (el día pertenece a la marca). Va a DECISIONS.md como "qué se rompe al crecer".
+- Q2 Solo ayer; no se elige otro día. Q22 Orden por `sent_at` ascendente, marcas mezcladas. Q23 Por defecto se ven todas; "Unreviewed" a un clic.
+- Q3 Estado en `searchParams` (`brand`, `status`, `reply`), render en el servidor. Un `reply` fuera de la cola → `notFound()`. Q13 Quien no lidera ninguna marca ve un estado vacío (200); un `?brand=` ajeno se ignora.
+- Q4 Móvil: lista o detalle ("← Queue"); desde `lg:`, dos columnas.
+- Q5 "Save and next" va a la siguiente sin reseñar por mí (da la vuelta); si no queda ninguna, "All caught up". Q7 "M reviewed" cuenta mis reseñas.
+- Q6 Si ya reseñé, formulario relleno y "Update and next". La reseña de otro lead no se muestra (calibración, V2).
+- Q8 `save_review(reply_id, score, comment, issue_codes[])`, sin `is_exemplar` (sin UI; mandarlo pisaría un `true`). Q15 Upsert por `(reply_id, reviewer_id)`, etiquetas reemplazadas por diferencia, devuelve el id. Q16 Chequeos explícitos en la función: `P0002` respuesta no visible, `42501` no es lead, `22023` etiqueta inválida o crítica con nota > 2.
+- Q9 Solo etiquetas activas; la función rechaza las inactivas. Editar una reseña con una etiqueta ya retirada: se deja pasar.
+- Q10 Comentario opcional, `trim`, ≤ 2000. La columna es `not null default ''`, así que vacío se guarda como `''` (no `null`).
+- Q11 Un solo PR, con `/replies/[id]`. Q20 `/replies/[id]` es solo lectura, con enlace a la cola si la respuesta es de ayer.
+- Q12 Atajos `1`–`5`, `J`/`K`, ignorados dentro del textarea; se recortan si pasamos los 60 min.
+- Q14 Tiempo de respuesta neutro, en mono (`2 h 20 min`).
+- Q17 La action devuelve `{ ok: true, nextReplyId } | { ok: false, error, fieldErrors? }`; el cliente hace `router.push`. Q21 `revalidatePath` de `/review` y `/replies/[id]`.
+- Q18 "Crítica ⇒ ≤ 2" es un error del `refine` sobre la nota; no se deshabilitan botones (la UI no sugiere notas). Q19 Chips por gravedad: `bad` / `warn` / neutro.
 
 ### 2026-09-23 · Decidido en el grill de TASK-003
 - La reseña se guarda con una función `save_review(reply_id, score, comment, is_exemplar, issue_codes[])`, con `security invoker`, en una sola transacción. Deriva `brand_id` de `replies`; no lo recibe como parámetro. Las políticas y los grants vienen de TASK-003 (Q5, Q14).

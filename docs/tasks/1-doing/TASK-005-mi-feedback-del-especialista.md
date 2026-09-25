@@ -25,14 +25,14 @@ docs/PLAN.md § 4.3. "¿Estoy mejorando? ¿Qué me corrigen siempre?". Trampa de
 
 ## Criterios de aceptación
 
-- [ ] `/me` como Dani lista solo sus respuestas reseñadas de Voltra y Boxwell, la más nueva arriba
-- [ ] Cada una muestra nota, etiquetas y comentario; las críticas en rojo (`text-bad`)
-- [ ] "Your average in Voltra" y "in Boxwell", con la cantidad de reseñas
-- [ ] Las etiquetas que más se repiten para Dani, por marca, con "last flagged"
-- [ ] Sus últimas 5 notas por marca, en orden, y "N critical"
-- [ ] No aparece ningún número calculado con respuestas de otra persona
-- [ ] Una marca que dejó sigue apareciendo como "Former brand"
-- [ ] La home le ofrece "See my feedback" a quien es especialista en alguna marca
+- [x] `/me` como Dani lista solo sus respuestas reseñadas de Voltra y Boxwell, la más nueva arriba
+- [x] Cada una muestra nota, etiquetas y comentario; las críticas en rojo (`text-bad`)
+- [x] "Your average in Voltra" y "in Boxwell", con la cantidad de reseñas
+- [x] Las etiquetas que más se repiten para Dani, por marca, con "last flagged"
+- [x] Sus últimas 5 notas por marca, en orden, y "N critical"
+- [x] No aparece ningún número calculado con respuestas de otra persona
+- [x] Una marca que dejó sigue apareciendo como "Former brand"
+- [x] La home le ofrece "See my feedback" a quien es especialista en alguna marca
 
 ## Fuera de alcance
 
@@ -79,6 +79,11 @@ Server Components que leen de `server/data`. Colores semánticos solo para resul
 - No calcular las medias sobre una consulta sin `specialist_id = user.id`: RLS solo no alcanza, porque a un lead le devuelve las respuestas de todo su equipo.
 
 ## Notas de implementación
+
+### 2026-09-25 · Revisión de los subagentes
+- `tenant-isolation-reviewer`: sin fugas. Verificó con SQL como cada persona (en transacciones con `rollback`) que `/me` solo agrega filas propias, incluso con rol mixto (Leo lead de Hebra) y al dejar una marca: la fila de `brands` llega `null` → "Former brand", y si ya no comparte marca con el lead → "Former lead". Deuda aplicada: `listMyFeedback()` toma el id de la sesión en vez de recibirlo por parámetro.
+- `code-reviewer`: sin hallazgos bloqueantes. Arreglado: una marca dejada decía "Your average in Former brand"; ahora dice "Your average".
+- Riesgo para DECISIONS.md: un exmiembro sigue viendo las reseñas nuevas sobre sus respuestas viejas. Es su propio trabajo, pero V2 debería decidir si se corta.
 
 ### 2026-09-25 · Grill antes de empezar
 - Q1: una sola consulta a `replies` con `specialist_id = user.id` (más RLS). Media y etiquetas se calculan en JS sobre esas mismas filas, las que se muestran. Sin migración; las vistas quedan para TASK-006, donde el agregado cruza especialistas.

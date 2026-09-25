@@ -52,8 +52,9 @@ export function TrendChart({ points, markers }: { points: TrendPoint[]; markers:
         <YAxis
           domain={[1, 5]}
           ticks={[1, 2, 3, 4, 5]}
-          allowDataOverflow
-          // Room for a point at 1 or 5 so it is not cut in half at the edge.
+          // No allowDataOverflow: averages always fall in 1–5, and with it
+          // Recharts clips the points to the plot, cutting a 1 or a 5 in half.
+          // The padding keeps those points off the axis line.
           padding={{ top: 8, bottom: 8 }}
           tick={{ fill: "var(--ink-muted)", fontSize: 12, fontFamily: "var(--font-mono)" }}
           tickLine={false}

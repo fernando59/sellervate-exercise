@@ -7,8 +7,11 @@ import { type CurrentUser, getOptionalUser } from "@/server/auth/session";
 import { MainNav, type NavItem } from "./main-nav";
 
 /**
- * Top-level frame: brand mark and the pages this person can open on the left,
- * the user switcher on the right. On a phone the links move to a second row.
+ * Top-level frame: brand mark and the user switcher, then the pages this
+ * person can open on a row of their own. A lead of several brands gets one
+ * link per brand, so the row wraps instead of competing with the switcher.
+ * Sticky from md: up only: on a phone a wrapped row would take a third of
+ * the screen.
  */
 export async function AppShell({ children }: { children: ReactNode }) {
   const user = await getOptionalUser();
@@ -16,17 +19,12 @@ export async function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-10 border-b border-line bg-surface/90 backdrop-blur">
+      <header className="relative z-10 border-b border-line bg-surface/90 backdrop-blur md:sticky md:top-0">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-6">
-            <Link href="/" className="flex shrink-0 items-baseline gap-2">
-              <span className="font-display text-base font-bold tracking-tight">Sellervate</span>
-              <span className="font-mono text-2xs uppercase tracking-widest text-ink-muted">QA</span>
-            </Link>
-            <div className="hidden min-w-0 md:block">
-              <MainNav items={nav} />
-            </div>
-          </div>
+          <Link href="/" className="flex shrink-0 items-baseline gap-2">
+            <span className="font-display text-base font-bold tracking-tight">Sellervate</span>
+            <span className="font-mono text-2xs uppercase tracking-widest text-ink-muted">QA</span>
+          </Link>
           <UserSwitcher
             people={demoPeopleOptions()}
             current={currentPersonOption(user)}
@@ -34,8 +32,10 @@ export async function AppShell({ children }: { children: ReactNode }) {
           />
         </div>
         {nav.length > 0 ? (
-          <div className="border-t border-line px-2 py-1.5 md:hidden">
-            <MainNav items={nav} />
+          <div className="border-t border-line">
+            <div className="mx-auto max-w-6xl px-2 py-1.5 sm:px-4">
+              <MainNav items={nav} />
+            </div>
           </div>
         ) : null}
       </header>

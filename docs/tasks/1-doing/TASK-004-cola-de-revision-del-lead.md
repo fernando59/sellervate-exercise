@@ -85,6 +85,16 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ## Notas de implementación
 
+### 2026-09-25 · Hallazgos de los subagentes
+- `tenant-isolation-reviewer`: no hay fugas, pero un lead podía saltarse `save_review` con un `POST /rest/v1/reviews` (nota 5 más `wrong_info`, comentario de 5000 caracteres); lo verificó en la base. Decisión del usuario, opción (a): se revocan las escrituras directas en `reviews` y `review_issues`, `save_review` pasa a `security definer` con el chequeo explícito de visibilidad (`P0002`) y se agrega `check (char_length(comment) <= 2000)`. Cambia la decisión Q5 de TASK-003 (antes era `security invoker`). Se corrigió en la misma migración, que solo se aplicó en local. `rls-matrix.sql` suma 3 casos.
+- `security-reviewer`: los mensajes de `save_review` llegan tal cual al usuario. Queda un comentario en `server/data/reviews.ts` para que sigan siendo fijos.
+- `code-reviewer`: con `status=unreviewed` y una respuesta ya reseñada en la URL, `J`/`K` no navegan (se deja pasar). El detalle muestra todas las reseñas visibles, no solo la propia (queda como pregunta para la review).
+
+### 2026-09-25 · Implementación
+- Bug encontrado antes del commit: a 320 px la página medía 383 de ancho. Un `<fieldset>` tiene `min-inline-size: min-content` por defecto y la etiqueta más larga lo estiraba. Se corrigió con `min-w-0` en los dos `fieldset`.
+- Caso borde que se deja pasar: el seed fecha las respuestas con `current_date` (UTC) y la cola usa `Europe/Madrid`. Entre las 22:00 y las 24:00 UTC, "ayer" en Madrid ya es otro día y la cola aparece vacía hasta que se corre `pnpm db:reset`.
+- `rls-matrix.sql` suma 7 casos para `save_review`, y todos pasan.
+
 ### 2026-09-25 · Grill de TASK-004
 - Q1 "Ayer" = día calendario en `APP_TIME_ZONE = "Europe/Madrid"`, aislado en `server/time.ts` (`yesterdayRange()`). No escala a equipos en varios husos: lo correcto sería `brands.time_zone` (el día pertenece a la marca). Va a DECISIONS.md como "qué se rompe al crecer".
 - Q2 Solo ayer; no se elige otro día. Q22 Orden por `sent_at` ascendente, marcas mezcladas. Q23 Por defecto se ven todas; "Unreviewed" a un clic.

@@ -12,6 +12,9 @@
 
 -- One row per reviewed reply, with every issue flagged on it by any review.
 -- The feed for /me: filter by specialist, brand, issue and text, then page.
+-- Read-only by grant. Postgres treats a single-table view as auto-updatable,
+-- so granting writes here (or on replies, e.g. for the importer) would make it
+-- a write path into replies. Keep it select-only.
 create view public.reviewed_replies
 with (security_invoker = on) as
 select

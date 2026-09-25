@@ -12,6 +12,7 @@ import { getReplyDetail } from "@/server/data/replies";
 import { listIssueTypes } from "@/server/data/reviews";
 import { formatDate } from "@/server/time";
 import { EmptyState } from "@/ui/empty-state";
+import { LinkButton } from "@/ui/link-button";
 
 export const metadata: Metadata = { title: "Review queue · Sellervate QA" };
 
@@ -26,7 +27,8 @@ export default async function ReviewPage({ searchParams }: PageProps<"/review">)
     return (
       <EmptyState
         title="The review queue is for brand leads"
-        description="You do not lead any brand, so there is nothing here to review. Your own feedback lives on your feedback page."
+        description="You do not lead any brand, so there is nothing here for you to review. Switch to a lead in the top right corner, or go back home."
+        action={<LinkButton href="/">Go home</LinkButton>}
       />
     );
   }

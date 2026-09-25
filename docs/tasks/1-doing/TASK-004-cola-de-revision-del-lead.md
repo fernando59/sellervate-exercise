@@ -1,12 +1,12 @@
 ---
 id: TASK-004
 titulo: Cola de revisión del lead y formulario de reseña
-estado: backlog
+estado: doing
 prioridad: alta
 estimacion: 60
 creada: 2026-09-23
-actualizada: 2026-09-23
-rama:
+actualizada: 2026-09-25
+rama: feat/review-queue
 pr:
 tags: [ui, review, forms]
 depende_de: [TASK-003]

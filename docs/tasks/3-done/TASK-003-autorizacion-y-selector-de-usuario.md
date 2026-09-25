@@ -1,11 +1,11 @@
 ---
 id: TASK-003
 titulo: Autorización en el servidor y selector de usuario
-estado: testing
+estado: done
 prioridad: alta
 estimacion: 50
 creada: 2026-09-23
-actualizada: 2026-09-23
+actualizada: 2026-09-25
 rama: feat/authz
 pr: https://github.com/fernando59/sellervate-exercise/pull/4
 tags: [authz, security, db]

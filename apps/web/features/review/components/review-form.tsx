@@ -3,12 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IssueType } from "@/server/data/reviews";
 import { saveReview } from "../actions";
 import { queueHref, type QueueParams } from "../queue-params";
 import {
   COMMENT_MAX,
+  CRITICAL_SCORE_CAP,
   REVIEW_FORM_LABELS as L,
   SCORES,
   reviewFormDefaults,
@@ -39,15 +40,17 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
   const [pending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
-  const schema = useMemo(
-    () => reviewFormSchema(issueTypes.filter((it) => it.severity === "critical").map((it) => it.code)),
+  const criticalCodes = useMemo(
+    () => issueTypes.filter((it) => it.severity === "critical").map((it) => it.code),
     [issueTypes],
   );
+  const schema = useMemo(() => reviewFormSchema(criticalCodes), [criticalCodes]);
 
   const {
     control,
     register,
     handleSubmit,
+    getValues,
     setValue,
     setError,
     formState: { errors, isSubmitted },
@@ -56,24 +59,36 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
     defaultValues: reviewFormDefaults(replyId, existing),
   });
 
+  // A critical issue caps the score. The buttons above the cap are disabled so
+  // the rule shows while choosing, not only on save; the refine and
+  // save_review still enforce it. A score already above the cap stays
+  // selected and flagged: changing the lead's judgement for them is worse
+  // than asking them to pick again.
+  const issueCodes = useWatch({ control, name: "issueCodes" });
+  const score = useWatch({ control, name: "score" });
+  const capped = issueCodes?.some((code) => criticalCodes.includes(code)) ?? false;
+  const overCap = capped && score !== undefined && score > CRITICAL_SCORE_CAP;
+
   // 1–5 set the score, J/K move through the queue. Ignored while typing.
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
       if (target?.closest("textarea, input[type=text], [contenteditable=true]")) return;
-      const score = Number(event.key);
-      if (SCORES.includes(score as (typeof SCORES)[number])) {
-        setValue("score", score, { shouldDirty: true, shouldValidate: isSubmitted });
+      const key = Number(event.key);
+      if (SCORES.includes(key as (typeof SCORES)[number])) {
+        const isCapped = getValues("issueCodes")?.some((code) => criticalCodes.includes(code));
+        if (isCapped && key > CRITICAL_SCORE_CAP) return;
+        setValue("score", key, { shouldDirty: true, shouldValidate: isSubmitted });
         return;
       }
-      const key = event.key.toLowerCase();
-      const destination = key === "j" ? nextReplyId : key === "k" ? prevReplyId : null;
+      const letter = event.key.toLowerCase();
+      const destination = letter === "j" ? nextReplyId : letter === "k" ? prevReplyId : null;
       if (destination) router.push(queueHref({ ...queue, reply: destination }));
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isSubmitted, nextReplyId, prevReplyId, queue, router, setValue]);
+  }, [criticalCodes, getValues, isSubmitted, nextReplyId, prevReplyId, queue, router, setValue]);
 
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
@@ -108,27 +123,51 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
           control={control}
           name="score"
           render={({ field }) => (
-            <div role="radiogroup" aria-label={L.score} className="grid grid-cols-5 gap-2">
-              {SCORES.map((n) => (
-                <label key={n} className="cursor-pointer">
-                  <input
-                    type="radio"
-                    name={field.name}
-                    value={n}
-                    checked={field.value === n}
-                    onChange={() => field.onChange(n)}
-                    onBlur={field.onBlur}
-                    className="peer sr-only"
-                  />
-                  <span className="flex h-12 items-center justify-center rounded-md border border-line bg-ground font-mono text-lg tabular-nums transition-colors hover:border-line-strong peer-checked:border-accent peer-checked:bg-accent peer-checked:text-accent-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
-                    {n}
-                  </span>
-                </label>
-              ))}
+            <div
+              role="radiogroup"
+              aria-label={L.score}
+              aria-describedby={capped ? "score-cap" : undefined}
+              className="grid grid-cols-5 gap-2"
+            >
+              {SCORES.map((n) => {
+                const checked = field.value === n;
+                const blocked = capped && n > CRITICAL_SCORE_CAP;
+                const look = checked
+                  ? blocked
+                    ? "border-bad bg-bad-soft text-bad"
+                    : "border-accent bg-accent text-accent-ink"
+                  : blocked
+                    ? "border-line bg-ground text-ink-muted opacity-40"
+                    : "border-line bg-ground hover:border-line-strong";
+                return (
+                  <label key={n} className={blocked ? "cursor-not-allowed" : "cursor-pointer"}>
+                    <input
+                      type="radio"
+                      name={field.name}
+                      value={n}
+                      checked={checked}
+                      disabled={blocked}
+                      onChange={() => field.onChange(n)}
+                      onBlur={field.onBlur}
+                      className="peer sr-only"
+                    />
+                    <span
+                      className={`flex h-12 items-center justify-center rounded-md border font-mono text-lg tabular-nums transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent ${look}`}
+                    >
+                      {n}
+                    </span>
+                  </label>
+                );
+              })}
             </div>
           )}
         />
-        {errors.score ? (
+        {capped ? (
+          <p id="score-cap" role={overCap ? "alert" : undefined} className={`text-xs ${overCap ? "text-bad" : "text-ink-muted"}`}>
+            A critical issue caps the score at {CRITICAL_SCORE_CAP}.{overCap ? ` Pick 1 or ${CRITICAL_SCORE_CAP}.` : ""}
+          </p>
+        ) : null}
+        {errors.score && !overCap ? (
           <p role="alert" className="text-xs text-bad">
             {errors.score.message}
           </p>

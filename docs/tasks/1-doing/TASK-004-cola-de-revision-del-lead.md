@@ -85,6 +85,11 @@ Next 16 server actions y `revalidatePath`; react-hook-form 7 y `@hookform/resolv
 
 ## Notas de implementación
 
+### 2026-09-25 · Cambio de Q18 (pedido del usuario al probar la UI)
+- Con una etiqueta crítica marcada, los botones 3–5 se deshabilitan y los atajos `3`–`5` se ignoran. Así la regla se ve mientras se elige, y no recién al guardar. No sugiere ninguna nota: la elección entre 1 y 2 sigue siendo del lead. El argumento original de Q18 ("la UI propondría la nota") era flojo.
+- Si la nota ya era mayor que 2 cuando se marca la crítica, no se cambia sola: queda seleccionada en rojo, con "Pick 1 or 2.", y no se puede guardar hasta elegir de nuevo.
+- El `refine` y `save_review` siguen como respaldo.
+
 ### 2026-09-25 · Hallazgos de los subagentes
 - `tenant-isolation-reviewer`: no hay fugas, pero un lead podía saltarse `save_review` con un `POST /rest/v1/reviews` (nota 5 más `wrong_info`, comentario de 5000 caracteres); lo verificó en la base. Decisión del usuario, opción (a): se revocan las escrituras directas en `reviews` y `review_issues`, `save_review` pasa a `security definer` con el chequeo explícito de visibilidad (`P0002`) y se agrega `check (char_length(comment) <= 2000)`. Cambia la decisión Q5 de TASK-003 (antes era `security invoker`). Se corrigió en la misma migración, que solo se aplicó en local. `rls-matrix.sql` suma 3 casos.
 - `security-reviewer`: los mensajes de `save_review` llegan tal cual al usuario. Queda un comentario en `server/data/reviews.ts` para que sigan siendo fijos.

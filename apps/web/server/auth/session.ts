@@ -14,7 +14,8 @@ export type Membership = {
 };
 
 /** A membership checked to be lead; the server/data functions for leads take it. */
-export type LeadMembership = Membership & { role: "lead" };
+export type LeadMembership = Membership & { role: "lead"; readonly [leadChecked]: true };
+declare const leadChecked: unique symbol;
 
 export type CurrentUser = {
   id: string;
@@ -83,7 +84,10 @@ export function requireMember(user: CurrentUser, brandSlug: string): Membership 
  * brand that does not exist look the same (TASK-006, Q1).
  */
 export function findLedBrand(user: CurrentUser, brandSlug: string): LeadMembership | null {
-  return user.memberships.find((m): m is LeadMembership => m.slug === brandSlug && m.role === "lead") ?? null;
+  const membership = user.memberships.find((m) => m.slug === brandSlug && m.role === "lead");
+  // The one place a LeadMembership is made: the brand is a type-only mark, so a
+  // hand-built { role: "lead" } object does not compile where one is required.
+  return membership ? (membership as LeadMembership) : null;
 }
 
 /**

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatDuration } from "@/lib/format";
 import type { ReplyDetail } from "@/server/data/replies";
 import { formatClock, formatDate } from "@/server/time";
@@ -6,14 +7,21 @@ import { formatClock, formatDate } from "@/server/time";
  * The brand's key rule and response time, then the customer's message and the
  * reply that was sent. The customer sits on the sunken ground; the reply is
  * the page itself, set in the reading measure, because it is what gets judged.
+ * withBrandLink links the brand name to its overview: only for a lead of it.
  */
-export function ReplyMessages({ reply }: { reply: ReplyDetail }) {
+export function ReplyMessages({ reply, withBrandLink = false }: { reply: ReplyDetail; withBrandLink?: boolean }) {
   const responseTime = formatDuration(Date.parse(reply.sentAt) - Date.parse(reply.receivedAt));
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="min-w-0 text-sm">
-          <span className="font-semibold">{reply.brand.name}</span>
+          {withBrandLink ? (
+            <Link href={`/brands/${reply.brand.slug}`} className="font-semibold text-accent hover:underline">
+              {reply.brand.name}
+            </Link>
+          ) : (
+            <span className="font-semibold">{reply.brand.name}</span>
+          )}
           <span className="text-ink-muted"> · {reply.brand.keyRule}</span>
         </p>
         <p className="shrink-0 font-mono text-2xs text-ink-muted">

@@ -65,9 +65,16 @@ export default async function HomePage() {
       ) : (
         <ul className="divide-y divide-line rounded-lg border border-line bg-surface">
           {user.memberships.map((m) => (
-            <li key={m.brandId} className="flex items-center justify-between px-5 py-3">
-              <span className="font-medium">{m.name}</span>
-              <span className="font-mono text-2xs uppercase tracking-widest text-ink-muted">{m.role}</span>
+            <li key={m.brandId} className="flex items-center justify-between gap-3 px-5 py-3">
+              <span className="min-w-0 truncate font-medium">{m.name}</span>
+              <span className="flex shrink-0 items-center gap-4">
+                <span className="font-mono text-2xs uppercase tracking-widest text-ink-muted">{m.role}</span>
+                {m.role === "lead" ? (
+                  <Link href={`/brands/${m.slug}`} className="text-sm font-medium text-accent hover:underline">
+                    Overview
+                  </Link>
+                ) : null}
+              </span>
             </li>
           ))}
         </ul>

@@ -77,4 +77,5 @@ Server Components que leen de `server/data`. Colores semánticos solo para resul
 
 ## Notas de implementación
 
-(vacío — no empezada)
+### 2026-09-23 · Aviso desde TASK-003 (tenant-isolation-reviewer)
+- Un especialista que dejó una marca sigue viendo sus respuestas y reseñas de esa marca, pero ya no la fila de `brands`. En `/me`, un embed `brand:brands(...)` va a llegar como `null` aunque los tipos generados digan que no. Tratar ese caso (o mostrar el nombre de la marca desde otro lado).

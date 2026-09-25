@@ -6,10 +6,12 @@
 // with the local API URL and the anon key if that file does not exist yet.
 //
 // It only ever writes the anon key: the app talks to Supabase with the user's JWT,
-// and the service_role key must not end up in the app's environment.
+// and the service_role key must not end up in the app's environment. An existing
+// .env.local only gets DEMO_USER_PASSWORD appended when it is missing, so a clone
+// from before the user switcher existed keeps working.
 
 import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 const envPath = 'apps/web/.env.local';
 const examplePath = 'apps/web/.env.example';
@@ -30,7 +32,14 @@ run('pnpm exec supabase start');
 run('pnpm exec supabase db reset');
 
 if (existsSync(envPath)) {
-  console.log(`\n${envPath} already exists, leaving it untouched.`);
+  const current = readFileSync(envPath, 'utf8');
+  if (/^DEMO_USER_PASSWORD=/m.test(current)) {
+    console.log(`\n${envPath} already exists, leaving it untouched.`);
+  } else {
+    const line = readFileSync(examplePath, 'utf8').match(/^DEMO_USER_PASSWORD=.*$/m)[0];
+    appendFileSync(envPath, `${current.endsWith('\n') ? '' : '\n'}${line}\n`);
+    console.log(`\n${envPath} already exists; added DEMO_USER_PASSWORD for the user switcher.`);
+  }
 } else {
   const status = JSON.parse(
     execSync('pnpm exec supabase status -o json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }),

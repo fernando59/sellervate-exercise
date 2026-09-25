@@ -1,13 +1,13 @@
 ---
 id: TASK-003
 titulo: Autorización en el servidor y selector de usuario
-estado: backlog
+estado: testing
 prioridad: alta
 estimacion: 50
 creada: 2026-09-23
 actualizada: 2026-09-23
-rama:
-pr:
+rama: feat/authz
+pr: https://github.com/fernando59/sellervate-exercise/pull/4
 tags: [authz, security, db]
 depende_de: [TASK-002]
 bloqueada_por:
@@ -25,14 +25,14 @@ docs/PLAN.md § 3 (matriz de roles) y § 6 (autorización). El login se puede si
 
 ## Criterios de aceptación
 
-- [ ] El selector de la cabecera muestra la persona y el rol actuales, y cambia a cualquiera de las 5
-- [ ] Logueado como Dani, `GET /api/brands/hebra/replies` responde 403
-- [ ] Logueado como Leo, `GET /api/brands/hebra/replies` responde 200 con solo sus respuestas
-- [ ] Logueado como Marta, `GET /api/brands/hebra/replies` responde 403; `/api/brands/voltra/replies` responde 200 con todas
-- [ ] Sin sesión, la API responde 401
-- [ ] Con el JWT de Dani, un `select` directo a `replies` devuelve solo las suyas (RLS, sin pasar por Next)
-- [ ] Una reseña insertada con el JWT de Nuria sobre una respuesta de Voltra es rechazada
-- [ ] El README tiene el `curl` del 403 listo para copiar
+- [x] El selector de la cabecera muestra la persona y el rol actuales, y cambia a cualquiera de las 5
+- [x] Logueado como Dani, `GET /api/brands/hebra/replies` responde 403
+- [x] Logueado como Leo, `GET /api/brands/hebra/replies` responde 200 con solo sus respuestas
+- [x] Logueado como Marta, `GET /api/brands/hebra/replies` responde 403; `/api/brands/voltra/replies` responde 200 con todas
+- [x] Sin sesión, la API responde 401
+- [x] Con el JWT de Dani, un `select` directo a `replies` devuelve solo las suyas (RLS, sin pasar por Next)
+- [x] Una reseña insertada con el JWT de Nuria sobre una respuesta de Voltra es rechazada
+- [x] El README tiene el `curl` del 403 listo para copiar
 
 ## Fuera de alcance
 
@@ -96,6 +96,35 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 - No devolver 404 vs 403 de forma que revele si una marca existe para alguien que no es miembro.
 
 ## Notas de implementación
+
+### 2026-09-25 · Puntos de la review (usuario)
+- **1:** el revoke global de `execute` no le quitó el permiso a ninguna función existente (`pgcrypto` y `uuid-ossp` se instalan antes). Ahora lo comprueba `rls-matrix.sql`.
+- **3:** ya estaba resuelto en `1b49db9`.
+- **5:** `/api/demo-session` compara el media type exacto. Antes `text/plain; x=application/json` pasaba el chequeo.
+- **7: cambia la decisión Q4 sobre `profiles`.** Antes: "quien comparta alguna marca contigo". Ahora: solo si uno de los dos es lead en esa marca. El lead ve a su equipo y el especialista ve a sus leads; dos especialistas no se ven entre sí. Perfiles visibles: dani 2 (antes 4), leo 3 (antes 5), sara 3 (antes 5); los leads no cambian.
+- **8:** regla nueva en CLAUDE.md y en PLAN § 12: una migración que ya está en `main` no se edita.
+- **6 (`using (true)` en `issue_types`) se deja:** reescribirlo como `auth.uid() is not null` es equivalente bajo `to authenticated` y solo esconde la decisión. Es el `leaving this:` del PR.
+
+### 2026-09-23 · Subagentes (antes del PR)
+- `security-reviewer` y `code-reviewer`: nada bloqueante. Menores: `/api/demo-session` sin zod (zod entra en TASK-004; la lista cerrada de 5 claves hace de whitelist) y sin rate limiting (no hay credenciales que adivinar).
+- `tenant-isolation-reviewer`: sin fugas. Arreglado en la migración, que todavía no se había subido:
+  1. `alter default privileges … in schema public revoke execute … from public` no hacía nada, porque un revoke por esquema no quita un default global. Una función `security definer` nueva en `public` quedaba ejecutable por `anon` vía `/rest/v1/rpc`. Ahora hay un revoke global.
+  2. Si un especialista deja la marca, el lead dejaba de ver su perfil y la API daba 500 (`r.specialist` null). Se agregó `authored_reply_in_led_brand` a la política de `profiles`.
+  3. El `insert` en `reviews` aceptaba `created_at`, `updated_at` e `id` del cliente. Ahora el insert también va con grant de columnas.
+  4. `review_issues` aceptaba etiquetas con `active = false`. Ahora el `with check` lo impide.
+  - Los cuatro quedaron como aserciones en `rls-matrix.sql`.
+  - El aviso para `/me` se anotó en TASK-005.
+
+### 2026-09-23 · Implementación
+- **Helpers en el esquema `private`**, no en `public`: PostgREST no los expone como RPC. `authenticated` necesita `execute` igual, porque las políticas se evalúan con el rol de quien consulta (el ejemplo de la skill revoca `execute` a `authenticated`, y eso rompería todas las políticas).
+- **`issue_types_select` es `using (true)`**: es la única política incondicional. El catálogo es global y no tiene datos de ninguna marca. Queda explicado en la migración.
+- **`updated_at` de `reviews` lo pone un trigger**: no está en el grant de columnas, así que la app no puede escribirlo.
+- **Cookie de sesión `httpOnly`**: `@supabase/ssr` la deja legible desde JS por defecto (`httpOnly: false`). Se fuerza con `cookieOptions` en `server.ts` y en `proxy.ts`, que tienen que coincidir. Verificado: `document.cookie` queda vacío.
+- **`requireMember`/`requireLeadOf` son síncronos** y trabajan sobre las membresías que `getOptionalUser()` ya cargó (con `cache` de React, por request). Esas membresías salen de la base de datos con RLS, no del request.
+- **`/api/demo-session` solo acepta JSON** (415 si no): un formulario de otro sitio no puede mandar `application/json` sin preflight, así que no puede loguear a un visitante como otra persona.
+- **Visto una vez, no reproducido (0/20):** `PGRST303 "JWT issued at future"` en la primera consulta justo después del login. Es un desfase de menos de 1 s entre los contenedores de Auth y PostgREST, no algo del código. Si el evaluador lo ve, recargar lo resuelve.
+- **Dev server:** Next 16 no deja correr dos `next dev` en la misma carpeta. La verificación se hizo con `next start` en el puerto 3100 (config `web-start` en `.claude/launch.json`, que no se commitea).
+- Matriz RLS (`supabase/tests/rls-matrix.sql`): marta 35 respuestas / 0 de Hebra, nuria 10 / 10, dani 15 / 0, leo 15 / 5, sara 15 / 5; `foreign_replies` = 0 para todos.
 
 ### 2026-09-23 · Grill, ronda 1 (decidido)
 - **Q1 contraseña del seed:** variable de entorno solo del servidor `DEMO_USER_PASSWORD`, no una constante. En producción no existiría; va a DECISIONS.md.

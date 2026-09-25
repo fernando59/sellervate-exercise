@@ -29,7 +29,7 @@ Reglas de Git:
 
 Antes de abrir un PR:
 - Correr `pnpm typecheck`, `pnpm lint` y `pnpm build` desde la raíz.
-- Si cambió la UI, mirar la página en el navegador.
+- Si cambió la UI, mirar la página en el navegador **a 320, 375, 768 y 1280 px**: sin scroll horizontal (`scrollWidth === innerWidth`), nada que se salga de su contenedor y los menús dentro de la pantalla.
 - Si cambió el esquema, correr `pnpm db:reset` y comprobar que el seed carga.
 - Pasar los subagentes de `.claude/agents/` (en paralelo) y resumirle al usuario lo que encontraron:
   - `code-reviewer` (Sonnet): siempre.
@@ -75,6 +75,8 @@ Tiempo:
 - No pulir de más. Si falta tiempo, recortar según el orden de recorte del plan.
 
 Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuario reemplazado por `<redacted>`. Ojo: también aparece escapado dentro de comandos `sed`.
+- **Se exportan solos** al cerrar o limpiar la sesión: hook `SessionEnd` en `.claude/settings.local.json` → `.claude/hooks/export-session-log.mjs`. Los dos archivos son locales y no se commitean porque tienen el email. El hook redacta el email, las claves `sb_secret_…` y cualquier JWT de `service_role`. Si la sesión ya tenía log, lo sobrescribe; si no, crea el `NN` siguiente con el nombre de la rama.
+- **El hook no commitea.** Al empezar una sesión, si `git status` muestra `ai-logs/` modificado o nuevo, el agente lo commitea (`docs: session log …`) en la rama de la tarea en curso.
 
 ## No negociables
 
@@ -82,15 +84,18 @@ Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuar
 - **Nunca** usar la clave `service_role` en código de la app; solo en el seed.
 - `brand_id` sale de la fila en la base de datos, **nunca** del input del request.
 - Toda tabla nueva lleva RLS **en la misma migración**. Las vistas llevan `security_invoker = on`.
+- **Una migración que ya está en `main` no se edita nunca**: cualquier cambio va en una migración nueva, porque otra base puede haberla aplicado y Supabase no la vuelve a correr. Mientras el PR está abierto y la migración solo se aplicó en la base local, se puede corregir en el mismo archivo, y el mensaje del commit lo dice.
 - Nada de enums de Postgres para catálogos; usar tablas o `text` + `check`.
 - **Ninguna funcionalidad de IA ni scoring automático.** Las ideas sobre modelos van a DECISIONS.md en un párrafo.
 - El seed es creíble (nada de lorem ipsum), las marcas suenan distintas y va en `seed.sql`, nunca en las migraciones.
 - En la UI, colores y tipografía **solo con las clases de token** (`bg-surface`, `text-ink-muted`, `border-line`, `text-bad`…), nunca hex sueltos.
+- **Toda UI es responsive desde el primer commit**, mobile-first (clases base para el móvil, `sm:`/`md:`/`lg:` para agrandar). Los textos que pueden crecer (nombres, marcas, asuntos) van con `truncate` o `min-w-0` dentro de flex, en vez de partirse y romper la altura. Lo que no entra en el móvil se oculta con `hidden sm:block`; no se achica hasta volverse ilegible. Las tablas y la cola de dos columnas se apilan en el móvil.
 
 ## Librerías y documentación
 
 - **Primero la documentación, después el código.** Antes de usar la API de una librería, consultar Context7 (`resolve-library-id` → `query-docs`, indicando la versión instalada) o la documentación oficial. En Next 16 manda la doc local (`apps/web/node_modules/next/dist/docs/`).
 - **Cada dependencia se instala en el PR que la usa por primera vez**, y el PR explica por qué la necesita.
+- **Versiones exactas, nunca rangos** (`"0.12.7"`, no `"^0.12.7"` ni `"~0.12.7"`). `saveExact: true` en `pnpm-workspace.yaml` hace que `pnpm add` las guarde así; si una aparece con `^` o `~`, se corrige en el mismo PR. En pnpm 11 esta configuración va en `pnpm-workspace.yaml`, **no** en `.npmrc`, que solo se lee para autenticación y registry. Actualizar una dependencia es un cambio explícito, en su propio commit, que dice por qué.
 
 | Librería | PR | Notas |
 |---|---|---|
@@ -157,8 +162,9 @@ Actualizar esta lista cada vez que se mergea un PR.
 
 - Repo: https://github.com/fernando59/sellervate-exercise (público; solo merge commits)
 - [x] PR1 `chore/scaffold`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/1), sin review escrita
-- [ ] PR2 `feat/schema-seed`: en curso (incluye `pnpm bootstrap`, ver sección 11 del plan)
-- [ ] PR3 `feat/authz`
+- [x] PR2 `feat/schema-seed`: mergeado (https://github.com/fernando59/sellervate-exercise/pull/2), sin review escrita
+- [x] `chore/task-board` (tablero `docs/tasks/`): mergeado (https://github.com/fernando59/sellervate-exercise/pull/3)
+- [ ] PR3 `feat/authz`: abierto (https://github.com/fernando59/sellervate-exercise/pull/4), pendiente de review
 - [ ] PR4 `feat/review-queue`
 - [ ] PR5 `feat/my-feedback`
 - [ ] PR6 `feat/brand-overview`
@@ -166,6 +172,4 @@ Actualizar esta lista cada vez que se mergea un PR.
 - [ ] `docs/decisions`: DECISIONS.md, README final, TIMELOG
 
 Pendientes conocidos:
-- `#user-switcher-slot` es un marcador vacío que se reemplaza en el PR3.
-- Las tablas tienen RLS activado pero sin políticas: hasta el PR3, la API no devuelve nada.
 - Nunca usar comillas invertidas dentro de strings de `bash -c`/`node -e`: bash las ejecuta. Para editar texto con Markdown, usar la herramienta Edit.

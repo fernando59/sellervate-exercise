@@ -16,7 +16,7 @@ The first `pnpm bootstrap` pulls the Supabase images and takes a few minutes; la
 
 ### Seed data
 
-Three brands that read very differently: **Voltra** (e-scooters, diagnose before offering a return), **Boxwell** (B2B packaging, three exact lines) and **Hebra** (a yarn shop). 45 replies over the last six weeks, 32 of them reviewed. Most of yesterday's replies are unreviewed, so the queue has work.
+Three brands that read very differently: **Voltra** (e-scooters, diagnose before offering a return), **Boxwell** (B2B packaging, three exact lines) and **Hebra** (a yarn shop). 55 replies over the last six weeks, 46 of them reviewed. Most of yesterday's replies are unreviewed, so the queue has work.
 
 | Person | Email | Role |
 |---|---|---|

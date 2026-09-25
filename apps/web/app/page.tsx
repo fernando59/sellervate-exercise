@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { demoPeopleOptions } from "@/features/session/current-person";
 import { PersonPicker } from "@/features/session/person-picker";
 import { isDemoLoginEnabled } from "@/server/auth/demo-users";
@@ -38,9 +39,15 @@ export default async function HomePage() {
     <section className="flex flex-col gap-8">
       <header className="flex flex-col gap-2">
         <h1 className="font-display text-2xl font-bold tracking-tight">Hi, {user.fullName.split(" ")[0]}</h1>
-        <p className="max-w-prose text-sm text-ink-muted">
-          The review queue and feedback screens are on their way. For now, this is what the server grants you.
-        </p>
+        <p className="max-w-prose text-sm text-ink-muted">This is what the server grants you.</p>
+        {user.memberships.some((m) => m.role === "lead") ? (
+          <Link
+            href="/review"
+            className="self-start rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink hover:opacity-90"
+          >
+            Open yesterday&apos;s review queue
+          </Link>
+        ) : null}
       </header>
 
       {user.memberships.length === 0 ? (

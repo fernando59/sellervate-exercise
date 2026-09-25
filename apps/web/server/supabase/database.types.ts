@@ -302,7 +302,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      save_review: {
+        Args: {
+          p_comment: string
+          p_issue_codes: string[]
+          p_reply_id: string
+          p_score: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

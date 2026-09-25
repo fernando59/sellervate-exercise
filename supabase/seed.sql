@@ -493,8 +493,12 @@ insert into public.replies (
 select
   b.id, p.id, 'seed', r.ext, r.ext,
   r.subject, r.customer_message, r.reply_body,
-  (current_date - r.days_ago) + r.received,
-  (current_date - r.days_ago) + r.received + make_interval(mins => r.minutes)
+  -- Times of day are Madrid time, and "days ago" counts Madrid days: the app
+  -- measures "yesterday" in Europe/Madrid (apps/web/server/time.ts). With UTC
+  -- dates, between 22:00 and 24:00 UTC the queue would find no replies.
+  ((now() at time zone 'Europe/Madrid')::date - r.days_ago + r.received) at time zone 'Europe/Madrid',
+  ((now() at time zone 'Europe/Madrid')::date - r.days_ago + r.received) at time zone 'Europe/Madrid'
+    + make_interval(mins => r.minutes)
 from seed_replies r
 join public.brands b on b.slug = r.brand
 join seed_people p on p.email = r.specialist || '@sellervate.test';

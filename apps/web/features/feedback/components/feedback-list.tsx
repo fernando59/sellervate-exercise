@@ -20,8 +20,8 @@ export function FeedbackList({ items, issueTypes }: { items: FeedbackItem[]; iss
             className={`flex min-w-0 flex-col gap-3 rounded-lg border border-l-4 bg-surface p-4 ${critical ? "border-line border-l-bad" : "border-line"}`}
           >
             <header className="flex min-w-0 flex-col gap-1">
-              <div className="flex min-w-0 items-center gap-2 font-mono text-2xs text-ink-muted">
-                <span className="truncate uppercase tracking-widest">{item.brandName ?? "Former brand"}</span>
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2 font-mono text-2xs text-ink-muted">
+                <span className="max-w-full truncate uppercase tracking-widest">{item.brandName ?? "Former brand"}</span>
                 <span aria-hidden="true">·</span>
                 <span className="shrink-0">{item.ticketRef}</span>
                 <span aria-hidden="true">·</span>

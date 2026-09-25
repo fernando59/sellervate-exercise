@@ -312,6 +312,7 @@ export type Database = {
           brand_id: string | null
           critical_count: number | null
           review_count: number | null
+          score_sum: number | null
           week: string | null
         }
         Relationships: [

@@ -29,13 +29,13 @@ export default async function BrandPage({ params }: PageProps<"/brands/[slug]">)
   const { slug } = await params;
   const membership = findLedBrand(user, slug);
   if (!membership) notFound();
-  const brand = await getBrand(membership.brandId);
+  const brand = await getBrand(membership);
   if (!brand) notFound();
 
   const [trend, issueCounts, specialists, issueTypes] = await Promise.all([
-    getBrandTrend(brand.id),
-    getBrandIssueCounts(brand.id),
-    getSpecialistScores(brand.id),
+    getBrandTrend(membership),
+    getBrandIssueCounts(membership),
+    getSpecialistScores(membership),
     listIssueTypes(),
   ]);
   const summary = summarizeTrend(trend.weeks);

@@ -1,12 +1,14 @@
 import "server-only";
 
+import type { LeadMembership } from "@/server/auth/session";
 import { createClient } from "@/server/supabase/server";
 import { recentWeekStarts, weekStartOf } from "@/server/time";
 
 // Every query here runs with the caller's JWT and reads security_invoker views,
-// so RLS decides what is aggregated. The page only calls these for a lead of
-// the brand (TASK-006, Q1); for anyone else the same queries would add up
-// their own replies only, never the team's.
+// so RLS decides what is aggregated. The functions take the caller's lead
+// membership (from findLedBrand), not a bare brand id: called for a specialist,
+// RLS would add up only their own replies and the page would present them as
+// the brand's, so the type makes the lead check part of the call.
 
 export const TREND_WEEKS = 8;
 
@@ -18,12 +20,12 @@ export type BrandHeader = {
 };
 
 /** The brand row, or null when RLS hides it. */
-export async function getBrand(brandId: string): Promise<BrandHeader | null> {
+export async function getBrand(lead: LeadMembership): Promise<BrandHeader | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("brands")
     .select("id, slug, name, key_rule")
-    .eq("id", brandId)
+    .eq("id", lead.brandId)
     .maybeSingle();
   if (error) throw error;
   return data && { id: data.id, slug: data.slug, name: data.name, keyRule: data.key_rule };
@@ -34,6 +36,8 @@ export type TrendWeek = {
   week: string;
   /** Null for a week without reviews: a gap in the chart, never a zero. */
   average: number | null;
+  /** Sum of the week's scores, unrounded, to average several weeks exactly. */
+  scoreSum: number;
   reviewCount: number;
   criticalCount: number;
 };
@@ -51,7 +55,7 @@ export type BrandTrend = {
 };
 
 /** The last TREND_WEEKS weeks, current week included, and the brand's events in them. */
-export async function getBrandTrend(brandId: string): Promise<BrandTrend> {
+export async function getBrandTrend(lead: LeadMembership): Promise<BrandTrend> {
   const weekStarts = recentWeekStarts(TREND_WEEKS);
   const from = weekStarts[0];
   const supabase = await createClient();
@@ -59,13 +63,13 @@ export async function getBrandTrend(brandId: string): Promise<BrandTrend> {
   const [scores, events] = await Promise.all([
     supabase
       .from("brand_weekly_scores")
-      .select("week, avg_score, review_count, critical_count")
-      .eq("brand_id", brandId)
+      .select("week, avg_score, score_sum, review_count, critical_count")
+      .eq("brand_id", lead.brandId)
       .gte("week", from),
     supabase
       .from("brand_events")
       .select("happened_on, note")
-      .eq("brand_id", brandId)
+      .eq("brand_id", lead.brandId)
       .gte("happened_on", from)
       .order("happened_on"),
   ]);
@@ -81,6 +85,7 @@ export async function getBrandTrend(brandId: string): Promise<BrandTrend> {
 type WeekRow = {
   week: string | null;
   avg_score: number | null;
+  score_sum: number | null;
   review_count: number | null;
   critical_count: number | null;
 };
@@ -93,6 +98,7 @@ function fillMissingWeeks(weekStarts: string[], rows: WeekRow[]): TrendWeek[] {
     return {
       week,
       average: row?.avg_score == null ? null : Number(row.avg_score),
+      scoreSum: Number(row?.score_sum ?? 0),
       reviewCount: row?.review_count ?? 0,
       criticalCount: row?.critical_count ?? 0,
     };
@@ -107,12 +113,12 @@ export type BrandIssueCount = {
 };
 
 /** How often each issue was flagged in the brand, all time, summed over specialists. */
-export async function getBrandIssueCounts(brandId: string): Promise<BrandIssueCount[]> {
+export async function getBrandIssueCounts(lead: LeadMembership): Promise<BrandIssueCount[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("specialist_issue_counts")
     .select("issue_code, flagged_count, last_sent_at")
-    .eq("brand_id", brandId);
+    .eq("brand_id", lead.brandId);
   if (error) throw error;
 
   const byCode = new Map<string, BrandIssueCount>();
@@ -142,12 +148,12 @@ export type SpecialistScore = {
  * time. Critical first, then the lowest average: who needs attention, not a
  * ranking (TASK-006, Q11).
  */
-export async function getSpecialistScores(brandId: string): Promise<SpecialistScore[]> {
+export async function getSpecialistScores(lead: LeadMembership): Promise<SpecialistScore[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("specialist_brand_scores")
     .select("specialist_id, avg_score, review_count, critical_count")
-    .eq("brand_id", brandId);
+    .eq("brand_id", lead.brandId);
   if (error) throw error;
 
   const ids = data.flatMap((r) => (r.specialist_id ? [r.specialist_id] : []));

@@ -21,6 +21,8 @@ select
   rp.brand_id,
   date_trunc('week', rp.sent_at at time zone 'Europe/Madrid')::date as week,
   round(avg(rv.score), 2) as avg_score,
+  -- Unrounded, so an average over several weeks is exact: sum / count.
+  sum(rv.score) as score_sum,
   count(*) as review_count,
   count(*) filter (where exists (
     select 1

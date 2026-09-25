@@ -13,6 +13,9 @@ export type Membership = {
   role: BrandRole;
 };
 
+/** A membership checked to be lead; the server/data functions for leads take it. */
+export type LeadMembership = Membership & { role: "lead" };
+
 export type CurrentUser = {
   id: string;
   fullName: string;
@@ -79,8 +82,8 @@ export function requireMember(user: CurrentUser, brandSlug: string): Membership 
  * that answer not found instead of 403: a brand the caller does not lead and a
  * brand that does not exist look the same (TASK-006, Q1).
  */
-export function findLedBrand(user: CurrentUser, brandSlug: string): Membership | null {
-  return user.memberships.find((m) => m.slug === brandSlug && m.role === "lead") ?? null;
+export function findLedBrand(user: CurrentUser, brandSlug: string): LeadMembership | null {
+  return user.memberships.find((m): m is LeadMembership => m.slug === brandSlug && m.role === "lead") ?? null;
 }
 
 /**

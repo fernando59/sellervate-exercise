@@ -3,7 +3,7 @@ id: TASK-005
 titulo: Mi feedback, la vista del especialista
 estado: doing
 prioridad: alta
-estimacion: 30
+estimacion: 90
 creada: 2026-09-23
 actualizada: 2026-09-25
 rama: feat/my-feedback
@@ -33,6 +33,10 @@ docs/PLAN.md § 4.3. "¿Estoy mejorando? ¿Qué me corrigen siempre?". Trampa de
 - [x] No aparece ningún número calculado con respuestas de otra persona
 - [x] Una marca que dejó sigue apareciendo como "Former brand"
 - [x] La home le ofrece "See my feedback" a quien es especialista en alguna marca
+- [x] La lista se pagina de a 20 ("21–40 of 312"); una página pasada del final ofrece volver, no da error
+- [x] Buscar `VOL-48102` o "turn on" encuentra por ticket o asunto; caracteres raros no rompen la consulta
+- [x] Filtrar por marca (solo las que cubre) y por etiqueta, desde las tarjetas; valores inválidos en la URL se ignoran
+- [x] Las tarjetas salen de vistas SQL, no de la página visible
 
 ## Fuera de alcance
 
@@ -58,7 +62,7 @@ Que los agregados de `/me` den lo mismo que calcularlos a mano solo con las fila
 
 ## Convenciones
 
-Server Components que leen de `server/data`. Colores semánticos solo para resultados y gravedad.
+Server Components que leen de `server/data`. Colores semánticos solo para resultados y gravedad. Vistas con `security_invoker = on` y migración nueva (nunca editar una mergeada).
 
 ## Skills a usar
 
@@ -70,6 +74,7 @@ Server Components que leen de `server/data`. Colores semánticos solo para resul
 
 ## Qué hacer
 
+- Migración `specialist_feedback_views` + `pnpm db:types`.
 - `server/data/feedback.ts`.
 - `app/me/page.tsx` y `features/feedback/`.
 
@@ -77,8 +82,19 @@ Server Components que leen de `server/data`. Colores semánticos solo para resul
 
 - No mostrar la media del equipo ni rankings.
 - No calcular las medias sobre una consulta sin `specialist_id = user.id`: RLS solo no alcanza, porque a un lead le devuelve las respuestas de todo su equipo.
+- No calcular las tarjetas sobre la página visible: con paginación, la media sería la de 20 filas.
 
 ## Notas de implementación
+
+### 2026-09-25 · Ronda 3 del grill: volumen del helpdesk
+El usuario pidió paginación y buscador: con el importador, un especialista va a tener miles de respuestas. Esto reemplaza Q1 y Q5.
+- Q14: tres vistas `security_invoker` en una migración nueva: `reviewed_replies` (feed filtrable), `specialist_brand_scores` y `specialist_issue_counts`. No filtran por persona para que TASK-006 las reutilice por marca; `/me` agrega `specialist_id = user`. Las últimas 5 notas, una consulta chica por marca.
+- Q15: búsqueda por ticket y asunto con `ilike`. Se limpian comillas, `\` y comodines antes de meterla en `or()`. Trigram, para DECISIONS.md como siguiente paso.
+- Q16: filtros por marca (select) y por etiqueta (clic en la tarjeta), en la URL.
+- Q17: Previous/Next de a 20 con `offset` y total. Cursor (keyset), para DECISIONS.md: con miles por persona `offset` alcanza.
+- Índice `(specialist_id, sent_at desc)` reemplaza a `replies(specialist_id)`.
+- Bug encontrado y arreglado: una página más allá del final hacía que PostgREST respondiera PGRST103 → error. Ahora cuenta y ofrece volver.
+- Paginación probada en el navegador con tamaño de página 5 temporal (el seed tiene ≤ 12 por persona) y vuelta a 20.
 
 ### 2026-09-25 · Revisión de los subagentes
 - `tenant-isolation-reviewer`: sin fugas. Verificó con SQL como cada persona (en transacciones con `rollback`) que `/me` solo agrega filas propias, incluso con rol mixto (Leo lead de Hebra) y al dejar una marca: la fila de `brands` llega `null` → "Former brand", y si ya no comparte marca con el lead → "Former lead". Deuda aplicada: `listMyFeedback()` toma el id de la sesión en vez de recibirlo por parámetro.

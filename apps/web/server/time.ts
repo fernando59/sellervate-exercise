@@ -52,6 +52,40 @@ export function formatDate(instant: string): string {
   return dateFormat.format(new Date(instant));
 }
 
+/**
+ * The Mondays of the last `count` weeks in APP_TIME_ZONE, oldest first and
+ * ending with the current week, as "YYYY-MM-DD". They match the week column of
+ * the brand_weekly_scores view, which truncates sent_at in the same zone.
+ */
+export function recentWeekStarts(count: number, now: Date = new Date()): string[] {
+  const today = zonedDateParts(now);
+  const todayUtc = Date.UTC(today.year, today.month - 1, today.day);
+  // getUTCDay: Sunday is 0. Days since Monday: Monday 0 … Sunday 6.
+  const sinceMonday = (new Date(todayUtc).getUTCDay() + 6) % 7;
+  const monday = todayUtc - sinceMonday * DAY_MS;
+  return Array.from({ length: count }, (_, i) => isoDay(monday - (count - 1 - i) * 7 * DAY_MS));
+}
+
+/** The Monday of the week a calendar day ("YYYY-MM-DD") falls in. */
+export function weekStartOf(day: string): string {
+  const t = Date.parse(`${day}T00:00:00Z`);
+  const sinceMonday = (new Date(t).getUTCDay() + 6) % 7;
+  return isoDay(t - sinceMonday * DAY_MS);
+}
+
+const shortDayFormat = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", day: "numeric", month: "short" });
+
+/** "14 Sept" for a calendar day ("YYYY-MM-DD"); no time zone shift. */
+export function formatShortDay(day: string): string {
+  return shortDayFormat.format(new Date(`${day}T00:00:00Z`));
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function isoDay(utcMs: number): string {
+  return new Date(utcMs).toISOString().slice(0, 10);
+}
+
 function zonedDateParts(instant: Date) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: APP_TIME_ZONE,

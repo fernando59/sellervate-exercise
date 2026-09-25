@@ -45,7 +45,7 @@ export class SaveReviewError extends Error {
 // The message of a mapped failure reaches the user as is. The migration keeps
 // them static; interpolating an id or any row data there would leak it.
 const FAILURE_BY_CODE: Record<string, SaveReviewFailure> = {
-  P0002: "not_found",
+  PT404: "not_found",
   "42501": "forbidden",
   "22023": "invalid",
 };

@@ -11,8 +11,10 @@
 -- security definer, because the caller no longer has the table privileges.
 -- RLS does not apply inside, so every rule the policies enforced is checked
 -- explicitly, and each failure has its own code the app can tell apart:
---   P0002  the reply does not exist, or the caller neither leads its brand
---          nor wrote it (a lead of another brand cannot learn it exists)
+--   PT404  the reply does not exist, or the caller neither leads its brand
+--          nor wrote it (a lead of another brand cannot learn it exists).
+--          PostgREST answers a PTxyz code with HTTP xyz, so a direct API
+--          call gets a 404, not the 500 an unmapped P0002 would give.
 --   42501  no session, or the caller can see the reply but does not lead it
 --   22023  invalid input (score, comment, issue codes, critical issue with score > 2)
 --
@@ -27,6 +29,25 @@ alter table public.reviews
 -- migration grants these privileges back, RLS still limits the damage.
 revoke insert, update on public.reviews from authenticated;
 revoke insert, delete on public.review_issues from authenticated;
+
+-- Who may see a reply, in one place. replies_select and save_review both use
+-- it: save_review runs as definer, so RLS does not apply inside and it has to
+-- ask the same question itself. A copy of the rule there would drift the day
+-- the policy changes.
+create function private.can_see_reply(p_specialist_id uuid, p_brand_id uuid)
+returns boolean
+language sql
+stable
+set search_path = ''
+as $$
+  select p_specialist_id = (select auth.uid()) or private.is_lead_of(p_brand_id);
+$$;
+
+revoke execute on function private.can_see_reply(uuid, uuid) from public, anon;
+grant execute on function private.can_see_reply(uuid, uuid) to authenticated;
+
+alter policy replies_select on public.replies
+  using (private.can_see_reply(specialist_id, brand_id));
 
 create function public.save_review(
   p_reply_id    uuid,
@@ -54,9 +75,9 @@ begin
   select r.brand_id, r.specialist_id into v_brand_id, v_specialist_id
   from public.replies r where r.id = p_reply_id;
 
-  -- Same visibility as replies_select: a lead of the brand or the author.
-  if not found or not (private.is_lead_of(v_brand_id) or v_specialist_id = v_uid) then
-    raise exception 'Reply not found.' using errcode = 'P0002';
+  -- The same rule as replies_select, from the same function.
+  if not found or not private.can_see_reply(v_specialist_id, v_brand_id) then
+    raise exception 'Reply not found.' using errcode = 'PT404';
   end if;
 
   if not private.is_lead_of(v_brand_id) then

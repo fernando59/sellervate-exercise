@@ -85,7 +85,7 @@ begin
           'a0000000-0000-4000-8000-000000000002', 5);
   raise exception 'FAIL: Nuria reviewed a Voltra reply';
 exception when insufficient_privilege then
-  raise notice 'ok: Nuria cannot review a Voltra reply (RLS with check)';
+  raise notice 'ok: Nuria cannot review a Voltra reply (direct writes revoked)';
 end $$;
 
 reset role;
@@ -158,7 +158,9 @@ exception when insufficient_privilege then
 end $$;
 reset role;
 
--- Marta tags a review with a retired issue type.
+-- Marta tags a review with a retired issue type directly. Since save_review,
+-- the revoke stops this before the policy does; the function rejects retired
+-- codes on its own (22023, below).
 update public.issue_types set active = false where code = 'slow';
 set local role authenticated;
 do $$
@@ -274,8 +276,8 @@ do $$
 begin
   perform public.save_review(current_setting('sellervate.voltra_reply')::uuid, 1, '', '{}');
   raise exception 'FAIL: Nuria saved a review on a Voltra reply';
-exception when no_data_found then
-  raise notice 'ok: save_review hides another brand''s reply (P0002)';
+exception when sqlstate 'PT404' then
+  raise notice 'ok: save_review hides another brand''s reply (PT404)';
 end $$;
 reset role;
 
@@ -351,8 +353,8 @@ do $$
 begin
   perform public.save_review(current_setting('sellervate.voltra_reply')::uuid, 3, '', '{}');
   raise exception 'FAIL: a former lead saved a review';
-exception when no_data_found then
-  raise notice 'ok: a lead who left the brand can no longer review it (P0002)';
+exception when sqlstate 'PT404' then
+  raise notice 'ok: a lead who left the brand can no longer review it (PT404)';
 end $$;
 reset role;
 

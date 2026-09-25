@@ -343,4 +343,17 @@ begin
 end $$;
 reset role;
 
+-- Marta stops leading Voltra: save_review checks the membership at call time.
+delete from public.brand_memberships
+where user_id = 'a0000000-0000-4000-8000-000000000001' and brand_id = current_setting('sellervate.voltra_brand')::uuid;
+set local role authenticated;
+do $$
+begin
+  perform public.save_review(current_setting('sellervate.voltra_reply')::uuid, 3, '', '{}');
+  raise exception 'FAIL: a former lead saved a review';
+exception when no_data_found then
+  raise notice 'ok: a lead who left the brand can no longer review it (P0002)';
+end $$;
+reset role;
+
 rollback;

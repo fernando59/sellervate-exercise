@@ -105,5 +105,7 @@ end;
 $$;
 
 -- New functions are not executable by anyone by default (authorization
--- migration). Only a signed-in user may call this one.
+-- migration). The revoke repeats it here, so a security definer function does
+-- not depend on those defaults staying in place. Only a signed-in user may call it.
+revoke execute on function public.save_review(uuid, integer, text, text[]) from public, anon;
 grant execute on function public.save_review(uuid, integer, text, text[]) to authenticated;

@@ -95,6 +95,7 @@ Logs de sesión: van a `ai-logs/NN-<tema>.md` + `.jsonl`, con el email del usuar
 
 - **Primero la documentación, después el código.** Antes de usar la API de una librería, consultar Context7 (`resolve-library-id` → `query-docs`, indicando la versión instalada) o la documentación oficial. En Next 16 manda la doc local (`apps/web/node_modules/next/dist/docs/`).
 - **Cada dependencia se instala en el PR que la usa por primera vez**, y el PR explica por qué la necesita.
+- **Versiones exactas, nunca rangos** (`"0.12.7"`, no `"^0.12.7"` ni `"~0.12.7"`). `saveExact: true` en `pnpm-workspace.yaml` hace que `pnpm add` las guarde así; si una aparece con `^` o `~`, se corrige en el mismo PR. En pnpm 11 esta configuración va en `pnpm-workspace.yaml`, **no** en `.npmrc`, que solo se lee para autenticación y registry. Actualizar una dependencia es un cambio explícito, en su propio commit, que dice por qué.
 
 | Librería | PR | Notas |
 |---|---|---|

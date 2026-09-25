@@ -1,7 +1,7 @@
 ---
 id: TASK-005
 titulo: Mi feedback, la vista del especialista
-estado: testing
+estado: done
 prioridad: alta
 estimacion: 90
 creada: 2026-09-23

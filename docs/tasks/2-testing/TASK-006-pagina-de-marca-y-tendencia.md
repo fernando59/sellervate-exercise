@@ -40,7 +40,7 @@ Descartado en el grill: abrir la página al especialista con sus datos (su tende
 - [ ] Una marca sin reseñas muestra un `EmptyState` con link a `/review`
 - [ ] El home enlaza a la página de cada marca que lidera, la franja de marca en `/review` también, y la cabecera tiene navegación según el rol
 - [ ] Sin scroll horizontal a 320, 375, 768 y 1280 px; la tabla por especialista se apila en el móvil
-- [ ] El gráfico tiene una tabla `sr-only` equivalente y el SVG va con `aria-hidden`
+- [ ] El gráfico tiene una tabla equivalente detrás de "Show the numbers" y el SVG va con `aria-hidden`
 
 ## Fuera de alcance
 
@@ -110,6 +110,13 @@ Recharts 3 (`LineChart`, `ReferenceLine`, `connectNulls`, `ResponsiveContainer` 
 - No mostrar al especialista agregados del equipo.
 
 ## Notas de implementación
+
+### 2026-09-25 · Arreglos que no debían quedar para la review
+El usuario marcó que la lista de puntos para su review tenía cosas arreglables (`suggestion:`/`question:`/`leaving this:`) y una afirmación sin verificar. Se arreglaron en la rama:
+- **Media exacta de 8 semanas** (`d78c79b`): la vista devuelve `score_sum` y el resumen es suma sobre cantidad, no una media de medias redondeadas. La migración se editó en el mismo archivo porque todavía no está en `main` y solo se aplicó en la base local. Comprobado: la página muestra 3,4 y SQL da 3,4348 con n = 23.
+- **Funciones de datos tipadas para lead** (`d78c79b`): `server/data/brand-overview.ts` recibe un `LeadMembership`, que solo devuelve `findLedBrand`. Es un type guard, no un cast: si se llama para un especialista, no compila.
+- **Tabla visible** (`9bf4c08`): la tabla `sr-only` pasó a un `<details>` "Show the numbers". Antes, un usuario de teclado que ve la pantalla no tenía cómo leer los números (el SVG es `aria-hidden` y no tiene capa de teclado). Comprobado: el `summary` recibe foco y se abre, la tabla tiene 8 filas y no hay scroll horizontal a 320 px.
+- **Navegación con muchas marcas** (`8b20b64`): se probó con Marta como lead de 6 marcas (4 temporales, borradas con `pnpm db:reset`). Antes: con los links en línea desde `md:`, la página medía 869 px a 768 y los links se salían de la cabecera a 1280. Ahora van en su propia fila y hacen wrap en todos los anchos. La cabecera es fija solo desde `md:`, y en móvil es `relative`, para que el menú del usuario quede por encima del gráfico (comprobado a 320 px). Sin scroll horizontal a 320, 375, 768 y 1280.
 
 ### 2026-09-25 · Prueba en el Chrome del usuario, con el PR abierto
 - Bug encontrado y arreglado (`032d928`): el punto hueco de la semana en curso (5,0) salía cortado por arriba. Lo causaba `allowDataOverflow` en el eje Y, porque Recharts recorta los puntos al área del gráfico; el `padding` no alcanzaba. Se quitó: las medias siempre están entre 1 y 5, así que el dominio sigue fijo.

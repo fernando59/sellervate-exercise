@@ -97,6 +97,14 @@ Todo `server/` con `import 'server-only'`. Un cliente de Supabase por request. `
 
 ## Notas de implementación
 
+### 2026-09-25 · Puntos de la review (usuario)
+- **1:** el revoke global de `execute` no le quitó el permiso a ninguna función existente (`pgcrypto` y `uuid-ossp` se instalan antes). Ahora lo comprueba `rls-matrix.sql`.
+- **3:** ya estaba resuelto en `1b49db9`.
+- **5:** `/api/demo-session` compara el media type exacto. Antes `text/plain; x=application/json` pasaba el chequeo.
+- **7: cambia la decisión Q4 sobre `profiles`.** Antes: "quien comparta alguna marca contigo". Ahora: solo si uno de los dos es lead en esa marca. El lead ve a su equipo y el especialista ve a sus leads; dos especialistas no se ven entre sí. Perfiles visibles: dani 2 (antes 4), leo 3 (antes 5), sara 3 (antes 5); los leads no cambian.
+- **8:** regla nueva en CLAUDE.md y en PLAN § 12: una migración que ya está en `main` no se edita.
+- **6 (`using (true)` en `issue_types`) se deja:** reescribirlo como `auth.uid() is not null` es equivalente bajo `to authenticated` y solo esconde la decisión. Es el `leaving this:` del PR.
+
 ### 2026-09-23 · Subagentes (antes del PR)
 - `security-reviewer` y `code-reviewer`: nada bloqueante. Menores: `/api/demo-session` sin zod (zod entra en TASK-004; la lista cerrada de 5 claves hace de whitelist) y sin rate limiting (no hay credenciales que adivinar).
 - `tenant-isolation-reviewer`: sin fugas. Arreglado en la migración, que todavía no se había subido:

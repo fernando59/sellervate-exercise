@@ -9,8 +9,8 @@
 -- Matrix (docs/PLAN.md § 3, TASK-003 grill Q4 and Q5):
 --   brands             members of the brand
 --   brand_memberships  your own rows, plus every row of the brands you lead
---   profiles           yourself, anyone who shares a brand with you, and the
---                      authors of replies in the brands you lead
+--   profiles           yourself, your leads (specialist) or your team (lead),
+--                      and the authors of replies in the brands you lead
 --   replies            the author, plus the leads of the reply's brand
 --   reviews            the leads of the brand, plus the author of the reviewed reply
 --   review_issues      whoever can read the parent review
@@ -61,10 +61,11 @@ as $$
   );
 $$;
 
--- True when the caller and target_user work on at least one common brand. Used
--- to read names only; what they can see of each other's work is decided by the
--- replies and reviews policies.
-create function private.shares_brand_with(target_user uuid)
+-- True when the caller and target_user share a brand in which at least one of
+-- them is the lead: a lead sees the names of their team, a specialist sees the
+-- names of their leads. Two specialists on the same brand do not see each
+-- other, since a specialist has no screen where a colleague's name belongs.
+create function private.shares_brand_via_lead(target_user uuid)
 returns boolean
 language sql
 stable
@@ -76,6 +77,7 @@ as $$
     from public.brand_memberships mine
     join public.brand_memberships theirs on theirs.brand_id = mine.brand_id
     where mine.user_id = (select auth.uid()) and theirs.user_id = target_user
+      and (mine.role = 'lead' or theirs.role = 'lead')
   );
 $$;
 
@@ -100,9 +102,9 @@ $$;
 -- Postgres grants execute to PUBLIC by default. Policies are evaluated as the
 -- calling role, so authenticated needs execute; anon never does.
 revoke execute on function private.is_member_of(uuid), private.is_lead_of(uuid),
-  private.shares_brand_with(uuid), private.authored_reply_in_led_brand(uuid) from public, anon;
+  private.shares_brand_via_lead(uuid), private.authored_reply_in_led_brand(uuid) from public, anon;
 grant execute on function private.is_member_of(uuid), private.is_lead_of(uuid),
-  private.shares_brand_with(uuid), private.authored_reply_in_led_brand(uuid) to authenticated;
+  private.shares_brand_via_lead(uuid), private.authored_reply_in_led_brand(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Table privileges
@@ -169,7 +171,7 @@ create policy profiles_select on public.profiles
   for select to authenticated
   using (
     id = (select auth.uid())
-    or private.shares_brand_with(id)
+    or private.shares_brand_via_lead(id)
     or private.authored_reply_in_led_brand(id)
   );
 

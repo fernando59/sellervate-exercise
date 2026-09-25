@@ -187,6 +187,21 @@ begin
 end $$;
 reset role;
 
+-- Dani sees Marta (their lead) but not Leo, a fellow specialist on Voltra.
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000003","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+begin
+  if exists (select 1 from public.profiles where id = 'a0000000-0000-4000-8000-000000000004') then
+    raise exception 'FAIL: a specialist sees a fellow specialist';
+  end if;
+  if not exists (select 1 from public.profiles where id = 'a0000000-0000-4000-8000-000000000001') then
+    raise exception 'FAIL: a specialist cannot see their lead';
+  end if;
+  raise notice 'ok: specialists see their leads, not each other';
+end $$;
+reset role;
+
 -- The global "revoke execute on functions from public" in the authorization
 -- migration only affects functions created after it. The extensions the app
 -- relies on (pgcrypto, uuid-ossp) were installed before, so none of their

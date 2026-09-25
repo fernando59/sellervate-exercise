@@ -46,7 +46,13 @@ export default async function ReviewPage({ searchParams }: PageProps<"/review">)
   }
   const issueTypes = selected ? await listIssueTypes() : [];
   const myReview = selected?.reviews.find((rv) => rv.reviewerId === user.id);
-  const index = selected ? visible.findIndex((i) => i.id === selected.id) : -1;
+  // J/K neighbours in queue order among the visible replies. The selection
+  // itself may be hidden by the filter (a reviewed reply with "Unreviewed"),
+  // so the position comes from the full list.
+  const position = selected ? queue.items.findIndex((i) => i.id === selected.id) : -1;
+  const isVisible = (id: string) => visible.some((v) => v.id === id);
+  const prevReplyId = position > 0 ? (queue.items.slice(0, position).findLast((i) => isVisible(i.id))?.id ?? null) : null;
+  const nextReplyId = position >= 0 ? (queue.items.slice(position + 1).find((i) => isVisible(i.id))?.id ?? null) : null;
 
   return (
     <section className="flex flex-col gap-6">
@@ -94,8 +100,8 @@ export default async function ReviewPage({ searchParams }: PageProps<"/review">)
               issueTypes={issueTypes.filter((it) => it.active)}
               existing={myReview}
               queue={state}
-              prevReplyId={index > 0 ? visible[index - 1].id : null}
-              nextReplyId={index >= 0 && index < visible.length - 1 ? visible[index + 1].id : null}
+              prevReplyId={prevReplyId}
+              nextReplyId={nextReplyId}
             />
           </div>
         ) : (

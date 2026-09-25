@@ -71,8 +71,7 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
     // lowering it: the lead picks 1 or 2, the form does not pick for them.
     const score = getValues("score");
     if (criticalCodes.includes(code) && score !== undefined && score > CRITICAL_SCORE_CAP) {
-      // The input type says number; an empty score is what the defaults use too.
-      setValue("score", undefined as unknown as number, { shouldDirty: true });
+      setValue("score", undefined, { shouldDirty: true });
     }
     return [...current, code];
   }

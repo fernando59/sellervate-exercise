@@ -32,6 +32,9 @@ export default async function ReplyPage({ params }: PageProps<"/replies/[id]">) 
   const isAuthor = reply.specialist.id === user.id;
   if (!isLead && !isAuthor) notFound();
 
+  // The author reads every review of their reply. A lead sees only their own,
+  // as in the queue (TASK-004, Q6): another lead's score is calibration, V2.
+  const reviews = isAuthor ? reply.reviews : reply.reviews.filter((rv) => rv.reviewerId === user.id);
   const issueTypes = await listIssueTypes();
   const inQueue = isLead && isWithin(reply.sentAt, yesterdayRange());
 
@@ -57,14 +60,14 @@ export default async function ReplyPage({ params }: PageProps<"/replies/[id]">) 
             <h2 id="reviews-heading" className="text-lg font-semibold">
               Review
             </h2>
-            {reply.reviews.length > 0 ? (
-              reply.reviews.map((rv) => <ReviewSummary key={rv.id} review={rv} issueTypes={issueTypes} />)
+            {reviews.length > 0 ? (
+              reviews.map((rv) => <ReviewSummary key={rv.id} review={rv} issueTypes={issueTypes} />)
             ) : (
               <EmptyState
                 title="Not reviewed yet"
                 description={
                   isLead
-                    ? "Nobody has reviewed this reply. Leads review yesterday's replies from the queue."
+                    ? "You have not reviewed this reply. Leads review yesterday's replies from the queue."
                     : "Your lead has not reviewed this reply yet. Their score and comments will show up here."
                 }
               />

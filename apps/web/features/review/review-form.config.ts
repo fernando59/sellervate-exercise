@@ -19,11 +19,18 @@ export function reviewFormSchema(criticalCodes: readonly string[]) {
   return z
     .object({
       replyId: z.uuid(),
+      // Empty (undefined) is a valid form state: nothing picked yet, or cleared
+      // by a critical issue. It is not a valid review, so the output is a number.
       score: z
-        .number({ error: "Pick a score from 1 to 5." })
-        .int()
-        .min(1, { error: "Pick a score from 1 to 5." })
-        .max(5, { error: "Pick a score from 1 to 5." }),
+        .number()
+        .optional()
+        .pipe(
+          z
+            .number({ error: "Pick a score from 1 to 5." })
+            .int()
+            .min(1, { error: "Pick a score from 1 to 5." })
+            .max(5, { error: "Pick a score from 1 to 5." }),
+        ),
       issueCodes: z.array(z.string().regex(/^[a-z_]+$/)).max(20),
       comment: z
         .string()
@@ -48,7 +55,7 @@ export type ReviewFormValues = z.output<ReturnType<typeof reviewFormSchema>>;
 export function reviewFormDefaults(
   replyId: string,
   existing?: { score: number; comment: string; issueCodes: string[] },
-): Partial<ReviewFormInput> {
+): ReviewFormInput {
   return {
     replyId,
     score: existing?.score,

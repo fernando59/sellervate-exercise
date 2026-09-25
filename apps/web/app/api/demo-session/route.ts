@@ -11,7 +11,11 @@ import { signInAsDemoPerson } from "@/server/auth/demo-users";
  * site cannot silently sign a visitor in as a seed person.
  */
 export async function POST(request: NextRequest) {
-  if (!request.headers.get("content-type")?.includes("application/json")) {
+  // Compare the media type itself: a substring check would also accept
+  // "text/plain; x=application/json", which a cross-site request can send
+  // without a CORS preflight.
+  const mediaType = request.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
+  if (mediaType !== "application/json") {
     return Response.json({ error: "Send JSON: { \"person\": \"dani\" }." }, { status: 415 });
   }
 

@@ -1,13 +1,13 @@
 ---
 id: TASK-005
 titulo: Mi feedback, la vista del especialista
-estado: doing
+estado: testing
 prioridad: alta
 estimacion: 90
 creada: 2026-09-23
 actualizada: 2026-09-25
 rama: feat/my-feedback
-pr:
+pr: https://github.com/fernando59/sellervate-exercise/pull/6
 tags: [ui, feedback]
 depende_de: [TASK-004]
 bloqueada_por:

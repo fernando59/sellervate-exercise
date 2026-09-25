@@ -134,7 +134,8 @@ export function ReviewForm({ replyId, issueTypes, existing, queue, prevReplyId, 
                 const blocked = capped && n > CRITICAL_SCORE_CAP;
                 const look = checked
                   ? blocked
-                    ? "border-bad bg-bad-soft text-bad"
+                    ? // Still the selection, filled like one, but in bad: it has to be changed.
+                      "border-bad bg-bad text-surface"
                     : "border-accent bg-accent text-accent-ink"
                   : blocked
                     ? "border-line bg-ground text-ink-muted opacity-40"

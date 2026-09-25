@@ -1,7 +1,7 @@
 ---
 id: TASK-004
 titulo: Cola de revisión del lead y formulario de reseña
-estado: testing
+estado: done
 prioridad: alta
 estimacion: 60
 creada: 2026-09-23

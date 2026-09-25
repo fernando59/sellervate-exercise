@@ -289,6 +289,13 @@ export type Database = {
             referencedColumns: ["id", "brand_id"]
           },
           {
+            foreignKeyName: "reviews_reply_brand_fkey"
+            columns: ["reply_id", "brand_id"]
+            isOneToOne: false
+            referencedRelation: "reviewed_replies"
+            referencedColumns: ["id", "brand_id"]
+          },
+          {
             foreignKeyName: "reviews_reviewer_id_fkey"
             columns: ["reviewer_id"]
             isOneToOne: false
@@ -299,7 +306,108 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      reviewed_replies: {
+        Row: {
+          brand_id: string | null
+          id: string | null
+          issue_codes: string[] | null
+          sent_at: string | null
+          specialist_id: string | null
+          subject: string | null
+          ticket_ref: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          id?: string | null
+          issue_codes?: never
+          sent_at?: string | null
+          specialist_id?: string | null
+          subject?: string | null
+          ticket_ref?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          id?: string | null
+          issue_codes?: never
+          sent_at?: string | null
+          specialist_id?: string | null
+          subject?: string | null
+          ticket_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "replies_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specialist_brand_scores: {
+        Row: {
+          avg_score: number | null
+          brand_id: string | null
+          critical_count: number | null
+          review_count: number | null
+          specialist_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "replies_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specialist_issue_counts: {
+        Row: {
+          brand_id: string | null
+          flagged_count: number | null
+          issue_code: string | null
+          last_sent_at: string | null
+          specialist_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "replies_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_issues_issue_code_fkey"
+            columns: ["issue_code"]
+            isOneToOne: false
+            referencedRelation: "issue_types"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
     }
     Functions: {
       save_review: {

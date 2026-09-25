@@ -81,4 +81,5 @@ Recharts 3 (`LineChart`, `ReferenceLine`, `connectNulls`) vía Context7; Next 16
 
 ## Notas de implementación
 
-(vacío — no empezada)
+### 2026-09-25 · Aviso desde TASK-005
+- Ya existen `specialist_brand_scores` (media, reseñas y críticas por especialista y marca) y `specialist_issue_counts` (etiqueta, cantidad y último `sent_at` por especialista y marca), las dos con `security_invoker = on`. La tabla por especialista y los problemas frecuentes pueden leerlas filtrando por `brand_id` (sumando por etiqueta). Falta solo la vista semanal.

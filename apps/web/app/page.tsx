@@ -40,14 +40,24 @@ export default async function HomePage() {
       <header className="flex flex-col gap-2">
         <h1 className="font-display text-2xl font-bold tracking-tight">Hi, {user.fullName.split(" ")[0]}</h1>
         <p className="max-w-prose text-sm text-ink-muted">This is what the server grants you.</p>
-        {user.memberships.some((m) => m.role === "lead") ? (
-          <Link
-            href="/review"
-            className="self-start rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink hover:opacity-90"
-          >
-            Open yesterday&apos;s review queue
-          </Link>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          {user.memberships.some((m) => m.role === "lead") ? (
+            <Link
+              href="/review"
+              className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink hover:opacity-90"
+            >
+              Open yesterday&apos;s review queue
+            </Link>
+          ) : null}
+          {user.memberships.some((m) => m.role === "specialist") ? (
+            <Link
+              href="/me"
+              className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink hover:opacity-90"
+            >
+              See my feedback
+            </Link>
+          ) : null}
+        </div>
       </header>
 
       {user.memberships.length === 0 ? (
